@@ -1,0 +1,40 @@
+<html>
+<head>
+  <link href="css/jquery-ui-1.8.16.custom.css" media="screen" rel="stylesheet" type="text/css" />
+
+  <script src="js/jquery_1_4_2.js" type="text/javascript"></script>
+  <script src="js/jquery-ui-1.8.16.custom.min.js" type="text/javascript"></script>
+  <script src="js/inheritable_widgets.js" type="text/javascript"></script>
+  <script src="js/test.js" type="text/javascript"></script>
+</head>
+<body>
+
+
+<input type="text" id="jquery_field" />
+
+
+<script type="text/javascript">
+  var g_autoc = jQuery('input#jquery_field').removebox({
+    source: [{label: 'aa', value: '11'}, {label: 'ab', value: '22'}, {label: 'bb', value: '33'}],
+    removerText: "delete",
+    select: function(event, ui){
+      console.log("selected value: "+ui.item.value);
+      // do let the autocomplete fill its text field with the selected value
+      // normally autocomplete would take the item's VALUE instead of it's label
+      event.preventDefault();
+      // fill the text field with the label
+      jQuery(this).val(ui.item.label);
+    },
+    remove: function(event, item){
+      console.log(arguments);
+      console.log('Item removed: '+item.label+' ('+item.value+')');
+    }
+  });
+
+
+  //g_autoc.removebox('search', 'b');
+  g_autoc.removebox('option', 'source', [{label: 'Netherlands', value: 'NL'}, {label: 'Germany', value: 'DE'}, {label: 'Belgium', value: 'BE'}]);
+</script>    
+    
+</body>
+</html>
