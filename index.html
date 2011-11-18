@@ -11,7 +11,7 @@
 
 
 <input type="text" id="jquery_field" />
-
+<input type="button" onclick="console.log(jQuery('input#jquery_field').removebox('val'));">
 
 <script type="text/javascript">
   var g_autoc = jQuery('input#jquery_field').removebox({
@@ -19,11 +19,6 @@
     removerText: "delete",
     select: function(event, ui){
       console.log("selected value: "+ui.item.value);
-      // do let the autocomplete fill its text field with the selected value
-      // normally autocomplete would take the item's VALUE instead of it's label
-      event.preventDefault();
-      // fill the text field with the label
-      jQuery(this).val(ui.item.label);
     },
     remove: function(event, item){
       console.log(arguments);
@@ -34,7 +29,8 @@
 
   //g_autoc.removebox('search', 'b');
   g_autoc.removebox('option', 'source', [{label: 'Netherlands', value: 'NL'}, {label: 'Germany', value: 'DE'}, {label: 'Belgium', value: 'BE'}]);
+  g_autoc.removebox('val', 'DE')
 </script>    
-    
+
 </body>
 </html>

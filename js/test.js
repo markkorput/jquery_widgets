@@ -287,6 +287,18 @@
       }
     },
 
+    val: function(new_value){
+      if(new_value === undefined) return this.value;
+      this.value = new_value;
+      
+      // check if the newly set value matches with one of the source item values. If so, set the label of that option in the text field.
+      var normalizer = this._normalizeItem;
+      if($.isArray(this.options.source) && (
+        ( matching_options = $.grep(this.options.source, function(item){return normalizer(item).value == new_value})).length
+      ))
+        this.element.val(normalizer(matching_options[0]).label);
+    },
+
     destroy: function() {
       this.element
         .removeClass( "ui-autocomplete-input" )
@@ -417,9 +429,11 @@
         }, 1);
       }
 
-      if ( false !== this._trigger( "select", event, { item: item } ) ) {
-        this.element.val( item.value );
+      if ( false !== this._trigger( "select", event, { item: item } ) ){
+        this.element.val( this.options.formatItem(item) );
+        this.value = item.value;
       }
+
       // reset the term after the select event
       // this allows custom select handling to work properly
       this.term = this.element.val();
@@ -525,7 +539,7 @@
   });
 })(jQuery);
 
-// fuga.combobox from a slightly patched version of the official jQuery UI Autocomplete widget
+// fuga.combobox inherits from a slightly patched version of the official jQuery UI Autocomplete widget (fuga.autocomplete)
 (function($){
   $.fuga.autocomplete.subclass('fuga.combobox', {
     options: {minLength: 0},
@@ -557,7 +571,8 @@
           $(this).blur();
 
           // perform empty search
-          self.search(self.element.val());
+          // self.search(self.element.val());
+          self.search('');
           self.element.focus();
         });
 
