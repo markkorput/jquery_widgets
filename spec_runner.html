@@ -1,0 +1,46 @@
+<html>
+<body>
+<head>
+  <title>Jasmine Test Runner</title>
+
+  <!-- Jasmine includes -->
+  <link rel="stylesheet" type="text/css" href="lib/jasmine/jasmine.css">
+  <script type="text/javascript" src="lib/jasmine/jasmine.js"></script>
+  <script type="text/javascript" src="lib/jasmine/jasmine-html.js"></script>
+
+  <!-- Dependency includes -->
+  <script type="text/javascript" src="lib/jquery_1_4_2.js"></script>
+  <script type="text/javascript" src="lib/jquery-ui-1.8.16.custom.min.js"></script>
+  <script type="text/javascript" src="lib/jquery.tooltip.pack.js"></script>
+  <script type="text/javascript" src="lib/underscore-1.1.4-min.js"></script>
+  <script type="text/javascript" src="lib/backbone-0.3.3-min.js"></script>
+
+  <!-- Source files -->
+  <script type="text/javascript" src="src/inheritable_widgets.js"></script>
+  <script type="text/javascript" src="src/fuga.autocomplete.js"></script>
+  <script type="text/javascript" src="src/fuga.combobox.js"></script>
+  <script type="text/javascript" src="src/fuga.removebox.js"></script>
+  <script type="text/javascript" src="src/fuga.cautiousinput.js"></script>
+
+  <!-- Spec files -->
+  <script type="text/javascript" src="spec/FugaAutocompleteSpec.js"></script>
+  <script type="text/javascript" src="spec/FugaRemoveBoxSpec.js"></script>
+</head>
+
+<body>
+
+
+
+<script type="text/javascript">
+
+  jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
+
+  jasmine.getEnv().execute();
+
+</script>
+
+
+
+</body>
+
+</html>
