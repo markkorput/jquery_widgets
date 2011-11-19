@@ -39,10 +39,6 @@
     
     destroy: function(){
       this.toggler.remove();
-    },
-
-    close: function(){
-      this._super();
     }
   }); // end of ui.ComboAutocomplete widget definition
   
