@@ -14,19 +14,21 @@
 
     _handleMenuSelectedEvent: function( event, ui ) {
       // check if it was NOT the remover link that was clicked
-      if(!$(event.originalTarget).hasClass(this.options.removerClass)){
+      if(!$(event.originalTarget).hasClass(this.options.removerClass))
         // continue with the original handler
         return this._super(event, ui);
-      }
-      
-      // the rmeove link was clicked, trigger remove callback and remove option is our source was an array 
+      else
+        return _handleItemRemove( event, ui);
+    },
+
+    _handleItemRemove: function( event, ui ){
+      // the remove link was clicked, trigger remove callback and remove option is our source was an array 
       removed_item = ui.item.data( "item.autocomplete" );
 
       // trigger remove callback and unless this callback cancels workflow, remove the option internally
       if($.isArray(this.options.source) && false !== this._trigger('remove', event, removed_item)){
         var normalizer = this._normalizeItem;
         // remove the item from the source array (if it was an array)
-        console.log(removed_item.value);
         this.option('source', $.grep(this.options.source, function(item){return normalizer(item).value != removed_item.value}));
       }
 

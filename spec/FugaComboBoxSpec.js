@@ -111,7 +111,7 @@ describe("Fuga ComboBox Widget", function(){
     expect( focus_on_text_input ).toBeTruthy();
   });
 
-  it("should disregard the content of the text input and show ALL options when clicking the toggle button", function(){
+  xit("should disregard the content of the text input and show ALL options when clicking the toggle button", function(){
     // fill the text input with a value tht matches with none of the options
     this.widget.val('XXX');
 

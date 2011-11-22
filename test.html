@@ -7,12 +7,28 @@
 
   <script src="src/inheritable_widgets.js" type="text/javascript"></script>
 
+  <!-- <script src="src/fuga.cautiousinput.js" type="text/javascript"></script> -->
+  <script src="coffee/fuga-cautious.js" type="text/javascript"></script>
   <script src="src/fuga.autocomplete.js" type="text/javascript"></script>
   <script src="src/fuga.combobox.js" type="text/javascript"></script>
-  <script src="src/fuga.removeebox.js" type="text/javascript"></script>
+  <script src="src/fuga.removebox.js" type="text/javascript"></script>
 </head>
 <body>
 
+<input type="text" id="cautious_field" />
+<script  type="text/javascript">
+  jQuery('input#cautious_field').cautious({delay: 400,
+    start: function(){console.log('start');},
+    stop: function(){console.log('stop');},
+    empty: function(){console.log('empty');},
+    new: function(){console.log('new');},
+    nevermind: function(){console.log('nevermind');},
+    same: function(){console.log('same');},
+    testt: function(){console.log('testt');}
+  });
+</script>
+
+<hr/>
 
 <input type="text" id="jquery_field" />
 <input type="button" onclick="console.log(jQuery('input#jquery_field').removebox('val'));">

@@ -20,4 +20,14 @@ describe("Fuga RemoveBox Widget", function(){
     });
   });
 
+  xit("should add a removed class to options which are selected for removal", function(){
+    
+  });
+
+  xit("should provide an easy remove interface for actual removal", function(){
+    
+  });
+
+  xit("should provide an easy un-remove interface", function(){
+  });
 });

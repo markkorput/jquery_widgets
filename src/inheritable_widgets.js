@@ -76,4 +76,12 @@ $.ui.basewidget.subclass = function subclass (name){
 	}
 };
 
+// Object.prototype.include_module = function(object){
+//   proto = object.prototype;
+// 
+//   for (key in proto) if (proto.hasOwnProperty(key)) {
+//     if($.isFunction(proto[key]) && )
+//   }
+// }
+
 })(jQuery);

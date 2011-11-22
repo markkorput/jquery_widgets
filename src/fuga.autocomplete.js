@@ -339,7 +339,7 @@
       var item = ui.item.data( "item.autocomplete" ),
         previous = this.previous;
 
-      // only trigger when focus was lost (click on menu)
+      // only when focus was lost (click on menu)
       if ( this.element[0] !== this.element[ 0 ].ownerDocument.activeElement ) {
         this.element.focus();
         this.previous = previous;
@@ -352,8 +352,11 @@
         }, 1);
       }
 
+      // make sure the select callbacks didn't cancel the event
       if ( false !== this._trigger( "select", event, { item: item } ) ){
+        // first set the "visible" value (the label)
         this.element.val( this.options.formatItem(item) );
+        // then set this wiget's actual selected value
         this.value = item.value;
       }
 
