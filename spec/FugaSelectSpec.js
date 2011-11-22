@@ -21,7 +21,7 @@
       return expect(this.widget.collector('value')).toEqual('1');
     });
     it("should change value when an option is clicked", function() {
-      this.widget.collector('menu').find('li a')[1].click();
+      this.widget.collector('menu').find('li:eq(1) a:first').click();
       return expect(this.widget.collector('value')).toEqual('2');
     });
     it("should allow changing value through the value setter, but only available values are allowed", function() {
@@ -37,7 +37,7 @@
     });
     it("should trigger change event when an options is clicked changes through value setter", function() {
       spyOnEvent(this.widget, 'collectorchange');
-      this.widget.collector('menu').find('li a')[1].click();
+      this.widget.collector('menu').find('li a:first-child')[1].click();
       return expect('collectorchange').toHaveBeenTriggeredOn(this.widget);
     });
     it("should hide the original dom-element", function() {
@@ -68,7 +68,7 @@
         widget.collector('destroy');
         return widget.remove();
       });
-      return expect($.map(widget.collector('menu').find('li a'), function(a) {
+      return expect($.map(widget.collector('menu').find('li a:first-child'), function(a) {
         return $(a).text();
       })).toEqual(['no 1', 'no 2', 'no 3']);
     });
@@ -93,7 +93,7 @@
     it("should update the display when the value changes", function() {
       this.widget.collector('value', '2');
       expect(this.widget.collector('display').text()).toEqual('second');
-      this.widget.collector('menu').find('li:first a').click();
+      this.widget.collector('menu').find('li:first a:first').click();
       return expect(this.widget.collector('display').text()).toEqual('first');
     });
     return it("should show a placeholder text", function() {
@@ -160,6 +160,50 @@
       this.widget.collector('display').click();
       this.widget.collector('display').click();
       return expect('collectorclose').toHaveBeenTriggeredOn(this.widget);
+    });
+  });
+
+  describe("Collector (Removing)", function() {
+    beforeEach(function() {
+      this.html = '<select><option value="1">first</option><option value="2">second</option><option value="3">third</option></select>';
+      return this.widget = $(this.html).appendTo($('body')).collector({
+        allow_delete: true,
+        remove_text: 'Get rid of this!'
+      });
+    });
+    afterEach(function() {
+      this.widget.collector('destroy');
+      return this.widget.remove();
+    });
+    it("should add delete links to each menu item", function() {
+      return expect(this.widget.collector('menu').find('li a.collector-remove').length).toEqual(3);
+    });
+    it("should provide a remove_text option that specifies remove link content", function() {
+      return expect(this.widget.collector('menu').find('li:first a.collector-remove').text()).toEqual('Get rid of this!');
+    });
+    it("should trigger a remove event when a remove link is clicked", function() {
+      spyOnEvent(this.widget, 'collectorremove');
+      this.widget.collector('menu').find('li:first a.collector-remove').click();
+      return expect('collectorremove').toHaveBeenTriggeredOn(this.widget);
+    });
+    it("should add the collector-removed class to removed items", function() {
+      var li;
+      li = this.widget.collector('menu').find('li:eq(1)');
+      expect(li).not.toHaveClass('collector-removed');
+      li.find('a.collector-remove').click();
+      return expect(li).toHaveClass('collector-removed');
+    });
+    it("should provide easy value-based interface to manually remove options", function() {
+      expect(this.widget.collector('menu').find('li:last')).not.toHaveClass('collector-removed');
+      this.widget.collector('remove_option', '3');
+      return expect(this.widget.collector('menu').find('li:last')).toHaveClass('collector-removed');
+    });
+    return it("should provide easy value-based interface to unremove options", function() {
+      expect(this.widget.collector('menu').find('li:last')).not.toHaveClass('collector-removed');
+      this.widget.collector('remove_option', '3');
+      expect(this.widget.collector('menu').find('li:last')).toHaveClass('collector-removed');
+      this.widget.collector('unremove_option', '3');
+      return expect(this.widget.collector('menu').find('li:last')).not.toHaveClass('collector-removed');
     });
   });
 

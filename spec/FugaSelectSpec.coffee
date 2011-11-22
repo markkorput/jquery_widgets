@@ -18,7 +18,7 @@ describe "Collector (Base)", ->
     expect(@widget.collector('value')).toEqual '1'
 
   it "should change value when an option is clicked", ->
-    @widget.collector('menu').find('li a')[1].click()
+    @widget.collector('menu').find('li:eq(1) a:first').click()
     expect(@widget.collector('value')).toEqual '2'
 
   it "should allow changing value through the value setter, but only available values are allowed", ->
@@ -35,7 +35,7 @@ describe "Collector (Base)", ->
   
   it "should trigger change event when an options is clicked changes through value setter", ->
     spyOnEvent(@widget, 'collectorchange')
-    @widget.collector('menu').find('li a')[1].click()
+    @widget.collector('menu').find('li a:first-child')[1].click()
     expect('collectorchange').toHaveBeenTriggeredOn(@widget)
   
   it "should hide the original dom-element", ->
@@ -51,7 +51,7 @@ describe "Collector (Base)", ->
     @after ->
       widget.collector('destroy')
       widget.remove()
-    expect($.map(widget.collector('menu').find('li a'), (a) -> $(a).text())).toEqual ['no 1', 'no 2', 'no 3']
+    expect($.map(widget.collector('menu').find('li a:first-child'), (a) -> $(a).text())).toEqual ['no 1', 'no 2', 'no 3']
 
 
 describe "Collector (Display)", ->
@@ -74,7 +74,7 @@ describe "Collector (Display)", ->
   it "should update the display when the value changes", ->
     @widget.collector('value', '2')
     expect(@widget.collector('display').text()).toEqual 'second'
-    @widget.collector('menu').find('li:first a').click()
+    @widget.collector('menu').find('li:first a:first').click()
     expect(@widget.collector('display').text()).toEqual 'first'
 
   it "should show a placeholder text", ->
@@ -138,5 +138,50 @@ describe "Collector (Toggling)", ->
     @widget.collector('display').click() # open
     @widget.collector('display').click() # close
     expect('collectorclose').toHaveBeenTriggeredOn(@widget)
+
+
+
+
+describe "Collector (Removing)", ->
+
+  beforeEach ->
+    @html = '<select><option value="1">first</option><option value="2">second</option><option value="3">third</option></select>'
+    @widget = $(@html).appendTo($('body')).collector
+      allow_delete: true
+      remove_text: 'Get rid of this!'
+
+  afterEach ->
+    @widget.collector('destroy')
+    @widget.remove()
+
+  it "should add delete links to each menu item", ->
+    expect(@widget.collector('menu').find('li a.collector-remove').length).toEqual 3
+
+  it "should provide a remove_text option that specifies remove link content", ->
+    expect(@widget.collector('menu').find('li:first a.collector-remove').text()).toEqual 'Get rid of this!'
+
+  it "should trigger a remove event when a remove link is clicked", ->
+    spyOnEvent(@widget, 'collectorremove')
+    @widget.collector('menu').find('li:first a.collector-remove').click()
+    expect('collectorremove').toHaveBeenTriggeredOn(@widget)
+
+  it "should add the collector-removed class to removed items", ->
+    li = @widget.collector('menu').find('li:eq(1)')
+    expect(li).not.toHaveClass 'collector-removed'
+    li.find('a.collector-remove').click()
+    expect(li).toHaveClass 'collector-removed'
+
+  it "should provide easy value-based interface to manually remove options", ->
+    expect(@widget.collector('menu').find('li:last')).not.toHaveClass 'collector-removed'
+    @widget.collector 'remove_option', '3'
+    expect(@widget.collector('menu').find('li:last')).toHaveClass 'collector-removed'
+
+  it "should provide easy value-based interface to unremove options", ->
+    expect(@widget.collector('menu').find('li:last')).not.toHaveClass 'collector-removed'
+    @widget.collector 'remove_option', '3'
+    expect(@widget.collector('menu').find('li:last')).toHaveClass 'collector-removed'
+    @widget.collector 'unremove_option', '3'
+    expect(@widget.collector('menu').find('li:last')).not.toHaveClass 'collector-removed'
+
 
 

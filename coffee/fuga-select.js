@@ -1,5 +1,5 @@
 (function() {
-  var $, FugaSelect, FugaSelectBase, FugaSelectDisplay, root;
+  var $, FugaSelect, FugaSelectBase, FugaSelectDisplay, FugaSelectToggler, root;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
   root = this;
@@ -83,13 +83,18 @@
     };
 
     FugaSelectBase.prototype._generateMenu = function(options) {
-      var menu;
+      var menu, self;
       options || (options = this._availableOptions());
       menu = $('<ul></ul>');
-      $.map(options, function(option) {
-        return $('<li></li>').attr('value', option.value).append($('<a></a>').text(option.label)).appendTo(menu);
+      self = this;
+      $.each(options, function(index, option) {
+        return self._generateMenuOption(option).appendTo(menu);
       });
       return menu;
+    };
+
+    FugaSelectBase.prototype._generateMenuOption = function(option) {
+      return $('<li></li>').attr('value', option.value).append($('<a></a>').text(option.label));
     };
 
     FugaSelectBase.prototype.value = function(new_value) {
@@ -167,57 +172,57 @@
 
   })();
 
-  FugaSelect = (function() {
+  FugaSelectToggler = (function() {
 
-    __extends(FugaSelect, FugaSelectDisplay);
+    __extends(FugaSelectToggler, FugaSelectDisplay);
 
-    function FugaSelect() {
-      FugaSelect.__super__.constructor.apply(this, arguments);
+    function FugaSelectToggler() {
+      FugaSelectToggler.__super__.constructor.apply(this, arguments);
     }
 
-    FugaSelect.prototype._createElements = function() {
-      FugaSelect.__super__._createElements.call(this);
+    FugaSelectToggler.prototype._createElements = function() {
+      FugaSelectToggler.__super__._createElements.call(this);
       return this._createContainer();
     };
 
-    FugaSelect.prototype._removeElements = function() {
+    FugaSelectToggler.prototype._removeElements = function() {
       this._removeContainer();
-      return FugaSelect.__super__._removeElements.call(this);
+      return FugaSelectToggler.__super__._removeElements.call(this);
     };
 
-    FugaSelect.prototype._createContainer = function() {
+    FugaSelectToggler.prototype._createContainer = function() {
       if (this.container_el) this._removeContainer();
       this.container_el = $('<div />').addClass('collector-container').addClass('collector-closed').insertAfter(this.element);
       if (this.display()) this.display().appendTo(this.container_el);
       if (this.menu()) return this.menu().appendTo(this.container_el);
     };
 
-    FugaSelect.prototype._removeContainer = function() {
+    FugaSelectToggler.prototype._removeContainer = function() {
       if (this.container_el) this.container_el.remove();
       return this.container_el = null;
     };
 
-    FugaSelect.prototype._setupBindings = function() {
-      FugaSelect.__super__._setupBindings.call(this);
+    FugaSelectToggler.prototype._setupBindings = function() {
+      FugaSelectToggler.__super__._setupBindings.call(this);
       if (this.display()) {
         return this.display().bind('click', $.proxy(this._handleDisplayClick, this));
       }
     };
 
-    FugaSelect.prototype._removeBindings = function() {
+    FugaSelectToggler.prototype._removeBindings = function() {
       if (this.display()) this.display().unbind('click');
-      return FugaSelect.__super__._removeBindings.call(this);
+      return FugaSelectToggler.__super__._removeBindings.call(this);
     };
 
-    FugaSelect.prototype._handleDisplayClick = function() {
+    FugaSelectToggler.prototype._handleDisplayClick = function() {
       return this.toggle();
     };
 
-    FugaSelect.prototype.container = function() {
+    FugaSelectToggler.prototype.container = function() {
       return this.container_el;
     };
 
-    FugaSelect.prototype.toggle = function() {
+    FugaSelectToggler.prototype.toggle = function() {
       if (this.is_open()) {
         return this.close();
       } else {
@@ -225,20 +230,62 @@
       }
     };
 
-    FugaSelect.prototype.is_open = function() {
+    FugaSelectToggler.prototype.is_open = function() {
       return this.container() && this.container().hasClass('collector-open');
     };
 
-    FugaSelect.prototype.open = function() {
+    FugaSelectToggler.prototype.open = function() {
       if (this._trigger('open')) {
         return this.container().removeClass('collector-closed').addClass('collector-open');
       }
     };
 
-    FugaSelect.prototype.close = function() {
+    FugaSelectToggler.prototype.close = function() {
       if (this._trigger('close')) {
         return this.container().removeClass('collector-open').addClass('collector-closed');
       }
+    };
+
+    return FugaSelectToggler;
+
+  })();
+
+  FugaSelect = (function() {
+
+    __extends(FugaSelect, FugaSelectToggler);
+
+    function FugaSelect() {
+      FugaSelect.__super__.constructor.apply(this, arguments);
+    }
+
+    FugaSelect.prototype.options = $.extend({}, FugaSelectToggler.options, {
+      allow_remove: false,
+      remove_text: "remove"
+    });
+
+    FugaSelect.prototype._generateMenuOption = function(option) {
+      return FugaSelect.__super__._generateMenuOption.call(this, option).append($('<a></a>').attr('href', '#').addClass('collector-remove').text(this.options.remove_text));
+    };
+
+    FugaSelect.prototype._handleMenuClick = function(event) {
+      var value;
+      if ($(event.target).is('a.collector-remove')) {
+        event.preventDefault();
+        value = $(event.target).parent('li').attr('value');
+        if (this._trigger('remove', event, value)) {
+          return this.remove_option(value);
+        }
+      } else {
+        return FugaSelect.__super__._handleMenuClick.call(this, event);
+      }
+    };
+
+    FugaSelect.prototype.remove_option = function(value) {
+      return this.menu().find('li[value=' + value + ']').addClass('collector-removed');
+    };
+
+    FugaSelect.prototype.unremove_option = function(value) {
+      return this.menu().find('li[value=' + value + ']').removeClass('collector-removed');
     };
 
     return FugaSelect;

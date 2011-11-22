@@ -40,7 +40,7 @@ class FugaSelectBase
 
   _getValue: -> @element.val()
 
-  _setValue: (value) -> @element.val value if @_trigger 'change', value
+  _setValue: (value) -> @element.val(value) if @_trigger 'change', value
 
   _availableOptions: -> @_availableOptionsCache ||= @_optionsFromOptions() || @_optionsFromSelect() || []
 
@@ -56,16 +56,19 @@ class FugaSelectBase
   _generateMenu: (options) ->
     options ||= @_availableOptions()
     menu = $ '<ul></ul>'
-    $.map options, (option) ->
-      $('<li></li>').attr('value', option.value).append($('<a></a>').text(option.label)).appendTo(menu)
+    self = this
+    $.each options, (index, option) -> self._generateMenuOption(option).appendTo(menu)
     return menu
+
+  _generateMenuOption: (option) ->
+    $('<li></li>').attr('value', option.value).append($('<a></a>').text(option.label))
+    
 
   value: (new_value) ->
     return @_setValue(new_value) if new_value
     @_getValue()
 
-  menu: ->
-    @menu_el
+  menu: -> @menu_el
 
 
 
@@ -112,7 +115,7 @@ class FugaSelectDisplay extends FugaSelectBase
 
 
 
-class FugaSelect extends FugaSelectDisplay
+class FugaSelectToggler extends FugaSelectDisplay
   _createElements: ->
     super()
     @_createContainer()
@@ -168,7 +171,21 @@ class FugaSelect extends FugaSelectDisplay
       @container().removeClass('collector-open').addClass('collector-closed')
 
 
+class FugaSelect extends FugaSelectToggler
+  options: $.extend({}, FugaSelectToggler.options, {allow_remove: false, remove_text: "remove"})
 
+  _generateMenuOption: (option) -> super(option).append($('<a></a>').attr('href', '#').addClass('collector-remove').text(@options.remove_text))
+
+  _handleMenuClick: (event) ->
+    if $(event.target).is('a.collector-remove')
+      event.preventDefault()
+      value = $(event.target).parent('li').attr('value')
+      @remove_option(value) if @_trigger 'remove', event, value
+    else
+      super(event)
+
+  remove_option: (value) -> @menu().find('li[value='+value+']').addClass('collector-removed')
+  unremove_option: (value) -> @menu().find('li[value='+value+']').removeClass('collector-removed')
 
 # register jquery widget from CautiousWidget class
 $.widget 'fuga.collector', new FugaSelect
