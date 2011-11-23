@@ -71,11 +71,11 @@
             // background: #3875d7
             // background: #aaa
             color: #fff
-            background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, white), color-stop(0.5, #eeeeee))
-            background-image: -webkit-linear-gradient(center bottom, white 0%, #eeeeee 50%)
+            background-image: -webkit-gradient(linear, right top, left top, color-stop(0, white), color-stop(0.5, #3875d7))
+            background-image: -webkit-linear-gradient(right center, white 0%, #3875d7 50%)
             background-image: -moz-linear-gradient(center right, white 0%, #3875d7 50%)
-            background-image: -o-linear-gradient(bottom, white 0%, #eeeeee 50%)
-            background-image: -ms-linear-gradient(top, #ffffff 0%,#eeeeee 50%)
+            background-image: -o-linear-gradient(right, white 0%, #3875d7 50%)
+            background-image: -ms-linear-gradient(left, #ffffff 0%,#3875d7 50%)
 
             em
               background: transparent
@@ -118,7 +118,8 @@
       li
         cursor: pointer
         &.cllctr-removed
-          text-decoration: line-through
+          // text-decoration: line-through
+          display: none
 
         abbr.cllctr-remove
           display: block
@@ -144,7 +145,8 @@
   // filtering
   &.cllctr-filtered
     ul.cllctr-options li.cllctr-filtered
-      color: #DDD
+      // color: #DDD
+      display: none
 
   // general stuff
   .cllctr-display

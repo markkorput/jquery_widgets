@@ -35,7 +35,7 @@
     });
     it("should trigger change event when an options is clicked changes through value setter", function() {
       spyOnEvent(this.widget, 'collectorchange');
-      this.widget.collector('menu').find('li')[1].click();
+      this.widget.collector('menu').find('li:eq(1)').click();
       return expect('collectorchange').toHaveBeenTriggeredOn(this.widget);
     });
     it("should hide the original dom-element", function() {

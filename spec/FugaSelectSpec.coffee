@@ -39,7 +39,7 @@ describe "Collector (Base)", ->
 
   it "should trigger change event when an options is clicked changes through value setter", ->
     spyOnEvent(@widget, 'collectorchange')
-    @widget.collector('menu').find('li')[1].click()
+    @widget.collector('menu').find('li:eq(1)').click()
     expect('collectorchange').toHaveBeenTriggeredOn(@widget)
 
   it "should hide the original dom-element", ->
