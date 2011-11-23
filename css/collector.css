@@ -57,8 +57,12 @@
         margin: 0;
         list-style: none; }
         .cllctr-container.cllctr-open .cllctr-drawer ul.cllctr-options li:hover, .cllctr-container.cllctr-open .cllctr-drawer ul.cllctr-options li.highlighted {
-          background: #3875d7;
-          color: white; }
+          color: white;
+          background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, white), color-stop(0.5, #eeeeee));
+          background-image: -webkit-linear-gradient(center bottom, white 0%, #eeeeee 50%);
+          background-image: -moz-linear-gradient(center right, white 0%, #3875d7 50%);
+          background-image: -o-linear-gradient(bottom, white 0%, #eeeeee 50%);
+          background-image: -ms-linear-gradient(top, white 0%, #eeeeee 50%); }
           .cllctr-container.cllctr-open .cllctr-drawer ul.cllctr-options li:hover em, .cllctr-container.cllctr-open .cllctr-drawer ul.cllctr-options li.highlighted em {
             background: transparent; }
         .cllctr-container.cllctr-open .cllctr-drawer ul.cllctr-options li em {
@@ -98,6 +102,15 @@
     cursor: pointer; }
     .cllctr-container.cllctr-open ul.cllctr-options li.cllctr-removed {
       text-decoration: line-through; }
+    .cllctr-container.cllctr-open ul.cllctr-options li abbr.cllctr-remove {
+      display: block;
+      float: right;
+      width: 12px;
+      height: 13px;
+      font-size: 1px;
+      background: url("collector-sprite.png") right top no-repeat transparent; }
+      .cllctr-container.cllctr-open ul.cllctr-options li abbr.cllctr-remove:hover {
+        background-position: right -11px; }
   .cllctr-container.cllctr-open input.cllctr-searcher {
     display: block; }
   .cllctr-container.cllctr-collapsed .cllctr-drawer {

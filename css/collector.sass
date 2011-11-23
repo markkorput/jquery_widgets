@@ -68,13 +68,21 @@
           margin: 0
           list-style: none
           &:hover, &.highlighted
-            background: #3875d7
+            // background: #3875d7
+            // background: #aaa
             color: #fff
+            background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, white), color-stop(0.5, #eeeeee))
+            background-image: -webkit-linear-gradient(center bottom, white 0%, #eeeeee 50%)
+            background-image: -moz-linear-gradient(center right, white 0%, #3875d7 50%)
+            background-image: -o-linear-gradient(bottom, white 0%, #eeeeee 50%)
+            background-image: -ms-linear-gradient(top, #ffffff 0%,#eeeeee 50%)
+
             em
               background: transparent
           em
             background: #feffde
             font-style: normal
+
     .cllctr-display
       -webkit-box-shadow: 0 0 5px rgba(0,0,0,.3)
       -moz-box-shadow   : 0 0 5px rgba(0,0,0,.3)
@@ -111,6 +119,20 @@
         cursor: pointer
         &.cllctr-removed
           text-decoration: line-through
+
+        abbr.cllctr-remove
+          display: block
+          // position: absolute
+          // right: 26px
+          // top: 8px
+          float: right
+          width: 12px
+          height: 13px
+          font-size: 1px
+          background: url('collector-sprite.png') right top no-repeat transparent
+          &:hover
+            background-position: right -11px
+
     input.cllctr-searcher
       display: block
 

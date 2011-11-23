@@ -171,20 +171,20 @@ describe "Collector (Removing)", ->
     @widget.remove()
 
   it "should add delete links to each menu item", ->
-    expect(@widget.collector('menu').find('li a.cllctr-remove').length).toEqual 3
+    expect(@widget.collector('menu').find('li abbr.cllctr-remove').length).toEqual 3
 
   it "should provide a remove_text option that specifies remove link content", ->
-    expect(@widget.collector('menu').find('li:first a.cllctr-remove').text()).toEqual 'Get rid of this!'
+    expect(@widget.collector('menu').find('li:first abbr.cllctr-remove').text()).toEqual 'Get rid of this!'
 
   it "should trigger a remove event when a remove link is clicked", ->
     spyOnEvent(@widget, 'collectorremove')
-    @widget.collector('menu').find('li:first a.cllctr-remove').click()
+    @widget.collector('menu').find('li:first abbr.cllctr-remove').click()
     expect('collectorremove').toHaveBeenTriggeredOn(@widget)
 
   it "should add the cllctr-removed class to removed items", ->
     li = @widget.collector('menu').find('li:eq(1)')
     expect(li).not.toHaveClass 'cllctr-removed'
-    li.find('a.cllctr-remove').click()
+    li.find('abbr.cllctr-remove').click()
     expect(li).toHaveClass 'cllctr-removed'
 
   it "should provide easy value-based interface to manually remove options", ->
@@ -202,7 +202,7 @@ describe "Collector (Removing)", ->
   it "shouldn't add the remove links by default", ->
     widget2 = $('<select><option value="1">first</option><option value="2">second</option><option value="3">third</option></select>').appendTo($('body')).collector()
     @after -> widget2.collector('destroy'); widget2.remove()
-    expect(widget2.collector('menu').find('li a.cllctr-remove')).not.toExist()
+    expect(widget2.collector('menu').find('li abbr.cllctr-remove')).not.toExist()
 
 
 

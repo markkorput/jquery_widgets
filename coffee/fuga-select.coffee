@@ -202,14 +202,14 @@ class FugaSelectToggler extends FugaSelectDisplay
 
 
 class FugaSelectRemover extends FugaSelectToggler
-  options: $.extend({}, FugaSelectToggler.options, {allow_remove: false, remove_text: "remove"})
+  options: $.extend({}, FugaSelectToggler.options, {allow_remove: false, remove_text: ""})
 
   _generateMenuOption: (option) ->
     return super(option) if @options.allow_remove != true
-    return super(option).append($('<a></a>').attr('href', '#').addClass('cllctr-remove').text(@options.remove_text))
+    return super(option).append($('<abbr />').addClass('cllctr-remove').text(@options.remove_text))
 
   _handleMenuClick: (event) ->
-    if $(event.target).is('a.cllctr-remove')
+    if $(event.target).is('abbr.cllctr-remove')
       event.preventDefault()
       value = $(event.target).parent('li').attr('value')
       @remove_option(value) if @_trigger 'remove', event, value
@@ -261,7 +261,7 @@ class FugaSelect extends FugaSelectRemover
     # set menu option classes according to the inmemory options' filtered states
     @_distributeFilteredStates()
 
-    # TODO go through all available options, set unmatching options to filtered and update menu item classes
+    # TODO go through all available options, set unbinding options to filtered and update menu item classes
     @container().addClass 'cllctr-filtered'
 
   _determineFilteredStates: (value) ->

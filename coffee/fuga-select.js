@@ -287,19 +287,19 @@
 
     FugaSelectRemover.prototype.options = $.extend({}, FugaSelectToggler.options, {
       allow_remove: false,
-      remove_text: "remove"
+      remove_text: ""
     });
 
     FugaSelectRemover.prototype._generateMenuOption = function(option) {
       if (this.options.allow_remove !== true) {
         return FugaSelectRemover.__super__._generateMenuOption.call(this, option);
       }
-      return FugaSelectRemover.__super__._generateMenuOption.call(this, option).append($('<a></a>').attr('href', '#').addClass('cllctr-remove').text(this.options.remove_text));
+      return FugaSelectRemover.__super__._generateMenuOption.call(this, option).append($('<abbr />').addClass('cllctr-remove').text(this.options.remove_text));
     };
 
     FugaSelectRemover.prototype._handleMenuClick = function(event) {
       var value;
-      if ($(event.target).is('a.cllctr-remove')) {
+      if ($(event.target).is('abbr.cllctr-remove')) {
         event.preventDefault();
         value = $(event.target).parent('li').attr('value');
         if (this._trigger('remove', event, value)) {

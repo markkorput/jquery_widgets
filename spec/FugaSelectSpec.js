@@ -188,21 +188,21 @@
       return this.widget.remove();
     });
     it("should add delete links to each menu item", function() {
-      return expect(this.widget.collector('menu').find('li a.cllctr-remove').length).toEqual(3);
+      return expect(this.widget.collector('menu').find('li abbr.cllctr-remove').length).toEqual(3);
     });
     it("should provide a remove_text option that specifies remove link content", function() {
-      return expect(this.widget.collector('menu').find('li:first a.cllctr-remove').text()).toEqual('Get rid of this!');
+      return expect(this.widget.collector('menu').find('li:first abbr.cllctr-remove').text()).toEqual('Get rid of this!');
     });
     it("should trigger a remove event when a remove link is clicked", function() {
       spyOnEvent(this.widget, 'collectorremove');
-      this.widget.collector('menu').find('li:first a.cllctr-remove').click();
+      this.widget.collector('menu').find('li:first abbr.cllctr-remove').click();
       return expect('collectorremove').toHaveBeenTriggeredOn(this.widget);
     });
     it("should add the cllctr-removed class to removed items", function() {
       var li;
       li = this.widget.collector('menu').find('li:eq(1)');
       expect(li).not.toHaveClass('cllctr-removed');
-      li.find('a.cllctr-remove').click();
+      li.find('abbr.cllctr-remove').click();
       return expect(li).toHaveClass('cllctr-removed');
     });
     it("should provide easy value-based interface to manually remove options", function() {
@@ -224,7 +224,7 @@
         widget2.collector('destroy');
         return widget2.remove();
       });
-      return expect(widget2.collector('menu').find('li a.cllctr-remove')).not.toExist();
+      return expect(widget2.collector('menu').find('li abbr.cllctr-remove')).not.toExist();
     });
   });
 
