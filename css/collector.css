@@ -1,9 +1,9 @@
-/* hide remove options */
-.cllctr-container li.cllctr-removed{display: none;}
 
-/* hide options when widget is closed */
+.cllctr-container.cllctr-open li.cllctr-removed{text-decoration: line-through;}
+.cllctr-container.cllctr-open input.cllctr-searcher{display: block;}
+
 .cllctr-container.cllctr-closed ul.cllctr-options{display: none;}
+.cllctr-container.cllctr-closed input.cllctr-searcher{display: none;}
 
-/* hide not-mtching (filtered) options when searching is active */
-.cllctr-container.cllctr-filtered li.cllctr-filtered{display: none;}
+.cllctr-container.cllctr-filtered li.cllctr-filtered{color: #DDD;}
 
