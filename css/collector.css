@@ -1,9 +1,11 @@
-
-.cllctr-container.cllctr-open li.cllctr-removed{text-decoration: line-through;}
+/* open */
+.cllctr-container.cllctr-open ul.cllctr-options li{cursor: pointer;}
+.cllctr-container.cllctr-open ul.cllctr-options li.cllctr-removed{text-decoration: line-through;}
 .cllctr-container.cllctr-open input.cllctr-searcher{display: block;}
 
-.cllctr-container.cllctr-closed ul.cllctr-options{display: none;}
-.cllctr-container.cllctr-closed input.cllctr-searcher{display: none;}
+/* collapsed */
+.cllctr-container.cllctr-collapsed ul.cllctr-options{display: none;}
+.cllctr-container.cllctr-collapsed input.cllctr-searcher{display: none;}
 
-.cllctr-container.cllctr-filtered li.cllctr-filtered{color: #DDD;}
+.cllctr-container.cllctr-filtered ul.cllctr-options li.cllctr-filtered{color: #DDD;}
 

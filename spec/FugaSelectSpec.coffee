@@ -18,7 +18,7 @@ describe "Collector (Base)", ->
     expect(@widget.collector('value')).toEqual '1'
 
   it "should change value when an option is clicked", ->
-    @widget.collector('menu').find('li:eq(1) a:first').click()
+    @widget.collector('menu').find('li:eq(1)').click()
     expect(@widget.collector('value')).toEqual '2'
 
   # it "should allow changing value through the value setter, but only available values are allowed", ->
@@ -39,7 +39,7 @@ describe "Collector (Base)", ->
 
   it "should trigger change event when an options is clicked changes through value setter", ->
     spyOnEvent(@widget, 'collectorchange')
-    @widget.collector('menu').find('li a:first-child')[1].click()
+    @widget.collector('menu').find('li')[1].click()
     expect('collectorchange').toHaveBeenTriggeredOn(@widget)
 
   it "should hide the original dom-element", ->
@@ -53,7 +53,7 @@ describe "Collector (Base)", ->
   it "should provide an option to specify the available choices", ->
     widget = $('<div />').appendTo($('body')).collector {options: [{value: 1, label: 'no 1'}, {value: 2, label: 'no 2'}, {value: 3, label: 'no 3'}]}
     @after -> widget.collector('destroy'); widget.remove()
-    expect($.map(widget.collector('menu').find('li a:first-child'), (a) -> $(a).text())).toEqual ['no 1', 'no 2', 'no 3']
+    expect($.map(widget.collector('menu').find('li'), (a) -> $(a).text())).toEqual ['no 1', 'no 2', 'no 3']
 
 
 describe "Collector (Display)", ->
@@ -76,7 +76,7 @@ describe "Collector (Display)", ->
   it "should update the display when the value changes", ->
     @widget.collector('value', '2')
     expect(@widget.collector('display').text()).toEqual 'second'
-    @widget.collector('menu').find('li:first a:first').click()
+    @widget.collector('menu').find('li:first').click()
     expect(@widget.collector('display').text()).toEqual 'first'
 
   it "should show a placeholder text", ->
@@ -103,21 +103,21 @@ describe "Collector (Toggling)", ->
     expect(@widget.collector('container')).toContain 'ul.cllctr-options'
 
   it "should hide the options menu by default", ->
-    expect(@widget.collector('container')).toHaveClass 'cllctr-closed'
+    expect(@widget.collector('container')).toHaveClass 'cllctr-collapsed'
 
   it "should toggle the options menu when clicking on the display", ->
     @widget.collector('display').click()
     expect(@widget.collector('container')).toHaveClass 'cllctr-open'
-    expect(@widget.collector('container')).not.toHaveClass 'cllctr-closed'
+    expect(@widget.collector('container')).not.toHaveClass 'cllctr-collapsed'
     @widget.collector('display').click()
-    expect(@widget.collector('container')).toHaveClass 'cllctr-closed'
+    expect(@widget.collector('container')).toHaveClass 'cllctr-collapsed'
     expect(@widget.collector('container')).not.toHaveClass 'cllctr-open'
 
   it "should provide open and close methods", ->
     @widget.collector('open')
     expect(@widget.collector('container')).toHaveClass 'cllctr-open'
     @widget.collector('close')
-    expect(@widget.collector('container')).toHaveClass 'cllctr-closed'
+    expect(@widget.collector('container')).toHaveClass 'cllctr-collapsed'
 
   it "should trigger open events", ->
     @widget.collector('open')
@@ -147,8 +147,8 @@ describe "Collector (Toggling)", ->
   it "should close the options menu when an option is selected", ->
     @widget.collector('open')
     expect(@widget.collector('container')).toHaveClass 'cllctr-open'
-    @widget.collector('menu').find('li:first a:first').click()
-    expect(@widget.collector('container')).toHaveClass 'cllctr-closed'
+    @widget.collector('menu').find('li:first').click()
+    expect(@widget.collector('container')).toHaveClass 'cllctr-collapsed'
 
   it "should cleanup nicely put the original element back and remove the container", ->
     @widget.collector 'destroy'

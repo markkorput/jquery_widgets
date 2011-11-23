@@ -21,7 +21,7 @@
       return expect(this.widget.collector('value')).toEqual('1');
     });
     it("should change value when an option is clicked", function() {
-      this.widget.collector('menu').find('li:eq(1) a:first').click();
+      this.widget.collector('menu').find('li:eq(1)').click();
       return expect(this.widget.collector('value')).toEqual('2');
     });
     it("should distribute new value to the original element", function() {
@@ -35,7 +35,7 @@
     });
     it("should trigger change event when an options is clicked changes through value setter", function() {
       spyOnEvent(this.widget, 'collectorchange');
-      this.widget.collector('menu').find('li a:first-child')[1].click();
+      this.widget.collector('menu').find('li')[1].click();
       return expect('collectorchange').toHaveBeenTriggeredOn(this.widget);
     });
     it("should hide the original dom-element", function() {
@@ -66,7 +66,7 @@
         widget.collector('destroy');
         return widget.remove();
       });
-      return expect($.map(widget.collector('menu').find('li a:first-child'), function(a) {
+      return expect($.map(widget.collector('menu').find('li'), function(a) {
         return $(a).text();
       })).toEqual(['no 1', 'no 2', 'no 3']);
     });
@@ -91,7 +91,7 @@
     it("should update the display when the value changes", function() {
       this.widget.collector('value', '2');
       expect(this.widget.collector('display').text()).toEqual('second');
-      this.widget.collector('menu').find('li:first a:first').click();
+      this.widget.collector('menu').find('li:first').click();
       return expect(this.widget.collector('display').text()).toEqual('first');
     });
     return it("should show a placeholder text", function() {
@@ -121,21 +121,21 @@
       return expect(this.widget.collector('container')).toContain('ul.cllctr-options');
     });
     it("should hide the options menu by default", function() {
-      return expect(this.widget.collector('container')).toHaveClass('cllctr-closed');
+      return expect(this.widget.collector('container')).toHaveClass('cllctr-collapsed');
     });
     it("should toggle the options menu when clicking on the display", function() {
       this.widget.collector('display').click();
       expect(this.widget.collector('container')).toHaveClass('cllctr-open');
-      expect(this.widget.collector('container')).not.toHaveClass('cllctr-closed');
+      expect(this.widget.collector('container')).not.toHaveClass('cllctr-collapsed');
       this.widget.collector('display').click();
-      expect(this.widget.collector('container')).toHaveClass('cllctr-closed');
+      expect(this.widget.collector('container')).toHaveClass('cllctr-collapsed');
       return expect(this.widget.collector('container')).not.toHaveClass('cllctr-open');
     });
     it("should provide open and close methods", function() {
       this.widget.collector('open');
       expect(this.widget.collector('container')).toHaveClass('cllctr-open');
       this.widget.collector('close');
-      return expect(this.widget.collector('container')).toHaveClass('cllctr-closed');
+      return expect(this.widget.collector('container')).toHaveClass('cllctr-collapsed');
     });
     it("should trigger open events", function() {
       this.widget.collector('open');
@@ -165,8 +165,8 @@
     it("should close the options menu when an option is selected", function() {
       this.widget.collector('open');
       expect(this.widget.collector('container')).toHaveClass('cllctr-open');
-      this.widget.collector('menu').find('li:first a:first').click();
-      return expect(this.widget.collector('container')).toHaveClass('cllctr-closed');
+      this.widget.collector('menu').find('li:first').click();
+      return expect(this.widget.collector('container')).toHaveClass('cllctr-collapsed');
     });
     return it("should cleanup nicely put the original element back and remove the container", function() {
       this.widget.collector('destroy');

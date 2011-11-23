@@ -49,9 +49,9 @@
 
     FugaSelectBase.prototype._handleMenuClick = function(event) {
       var value;
-      if ($(event.target).is('a')) {
+      if ($(event.target).is('li')) {
         event.preventDefault();
-        value = $(event.target).parent('li').attr('value');
+        value = $(event.target).attr('value');
         if (this._trigger('select', event, value)) return this._setValue(value);
       }
     };
@@ -107,7 +107,7 @@
     };
 
     FugaSelectBase.prototype._generateMenuOption = function(option) {
-      return $('<li></li>').attr('value', option.value).append($('<a></a>').text(option.label));
+      return $('<li></li>').attr('value', option.value).text(option.label);
     };
 
     FugaSelectBase.prototype.value = function(new_value) {
@@ -202,7 +202,7 @@
 
     FugaSelectToggler.prototype._createContainer = function() {
       this._removeContainer();
-      this.container_el = $('<div />').addClass('cllctr-container').addClass('cllctr-closed').insertAfter(this.element);
+      this.container_el = $('<div />').addClass('cllctr-container').addClass('cllctr-collapsed').insertAfter(this.element);
       this.element.appendTo(this.container());
       if (this.display()) this.display().appendTo(this.container());
       if (this.menu()) return this.menu().appendTo(this.container());
@@ -257,13 +257,13 @@
 
     FugaSelectToggler.prototype.open = function() {
       if (this._trigger('open')) {
-        return this.container().removeClass('cllctr-closed').addClass('cllctr-open');
+        return this.container().removeClass('cllctr-collapsed').addClass('cllctr-open');
       }
     };
 
     FugaSelectToggler.prototype.close = function() {
       if (this._trigger('close')) {
-        return this.container().removeClass('cllctr-open').addClass('cllctr-closed');
+        return this.container().removeClass('cllctr-open').addClass('cllctr-collapsed');
       }
     };
 

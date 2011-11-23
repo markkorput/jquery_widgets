@@ -32,9 +32,9 @@ class FugaSelectBase
   _handleChange: (event) -> @_setValue @element.val()
 
   _handleMenuClick: (event) ->
-    if $(event.target).is('a')
+    if $(event.target).is('li')
       event.preventDefault()
-      value = $(event.target).parent('li').attr('value')
+      value = $(event.target).attr('value')
       if @_trigger 'select', event, value
         @_setValue value
 
@@ -70,8 +70,7 @@ class FugaSelectBase
     return menu
 
   _generateMenuOption: (option) ->
-    $('<li></li>').attr('value', option.value).append($('<a></a>').text(option.label))
-    
+    $('<li></li>').attr('value', option.value).text(option.label)
 
   value: (new_value) ->
     return @_setValue(new_value) if new_value
@@ -137,7 +136,7 @@ class FugaSelectToggler extends FugaSelectDisplay
   _createContainer: ->
     # remove any existing container
     @_removeContainer()
-    @container_el = $('<div />').addClass('cllctr-container').addClass('cllctr-closed').insertAfter(@element)
+    @container_el = $('<div />').addClass('cllctr-container').addClass('cllctr-collapsed').insertAfter(@element)
 
     # append the original control and the display and menu elements created by parent classes inside the container
     @element.appendTo(@container())
@@ -183,11 +182,11 @@ class FugaSelectToggler extends FugaSelectDisplay
 
   open: ->
     if @_trigger 'open'
-      @container().removeClass('cllctr-closed').addClass('cllctr-open')
+      @container().removeClass('cllctr-collapsed').addClass('cllctr-open')
 
   close: ->
     if @_trigger 'close'
-      @container().removeClass('cllctr-open').addClass('cllctr-closed')
+      @container().removeClass('cllctr-open').addClass('cllctr-collapsed')
 
 
 class FugaSelectRemover extends FugaSelectToggler
