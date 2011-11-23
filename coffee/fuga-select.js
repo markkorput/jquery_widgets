@@ -85,7 +85,7 @@
     FugaSelectBase.prototype._generateMenu = function(options) {
       var menu, self;
       options || (options = this._availableOptions());
-      menu = $('<ul></ul>');
+      menu = $('<ul></ul>').addClass('collector-options');
       self = this;
       $.each(options, function(index, option) {
         return self._generateMenuOption(option).appendTo(menu);
@@ -133,12 +133,13 @@
     };
 
     FugaSelectDisplay.prototype._createDisplay = function() {
-      if (this.display_el) this.display_el.remove();
-      return this.display_el = $('<a></a>').attr('href', '#').attr('onclick', 'return false').insertAfter(this.element).text(this._displayText());
+      this._removeDisplay();
+      this.display_el = $('<a></a>').attr('href', '#').attr('onclick', 'return false').addClass('collector-display').insertAfter(this.element);
+      return this.display().text(this._displayText());
     };
 
     FugaSelectDisplay.prototype._removeDisplay = function() {
-      if (this.display_el) this.display_el.remove();
+      if (this.display()) this.display().remove();
       return this.display_el = null;
     };
 
@@ -191,14 +192,20 @@
     };
 
     FugaSelectToggler.prototype._createContainer = function() {
-      if (this.container_el) this._removeContainer();
+      this._removeContainer();
       this.container_el = $('<div />').addClass('collector-container').addClass('collector-closed').insertAfter(this.element);
-      if (this.display()) this.display().appendTo(this.container_el);
-      if (this.menu()) return this.menu().appendTo(this.container_el);
+      this.element.appendTo(this.container());
+      if (this.display()) this.display().appendTo(this.container());
+      if (this.menu()) return this.menu().appendTo(this.container());
     };
 
     FugaSelectToggler.prototype._removeContainer = function() {
-      if (this.container_el) this.container_el.remove();
+      if (this.container()) {
+        this.element.insertBefore(this.container());
+        if (this.display()) this.display().insertBefore(this.container());
+        if (this.menu()) this.menu().insertBefore(this.container());
+        this.container().remove();
+      }
       return this.container_el = null;
     };
 

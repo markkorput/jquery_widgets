@@ -117,7 +117,10 @@
       return this.widget.remove();
     });
     it("should render the displayer and options menu withing a wrapper", function() {
-      return expect(this.widget.collector('container')).toBeVisible();
+      expect(this.widget.collector('container')).toExist();
+      expect(this.widget.collector('container')).toContain('select');
+      expect(this.widget.collector('container')).toContain('a.collector-display');
+      return expect(this.widget.collector('container')).toContain('ul.collector-options');
     });
     it("should hide the options menu by default", function() {
       return expect(this.widget.collector('container')).toHaveClass('collector-closed');
@@ -155,11 +158,16 @@
       this.widget.collector('close');
       return expect('collectorclose').toHaveBeenTriggeredOn(this.widget);
     });
-    return it("should trigger a close event when the menu closes by a click", function() {
+    it("should trigger a close event when the menu closes by a click", function() {
       spyOnEvent(this.widget, 'collectorclose');
       this.widget.collector('display').click();
       this.widget.collector('display').click();
       return expect('collectorclose').toHaveBeenTriggeredOn(this.widget);
+    });
+    return it("should cleanup nicely put the original element back and remove the container", function() {
+      this.widget.collector('destroy');
+      expect(this.widget.collector('container')).not.toExist();
+      return expect(this.widget).toBeVisible();
     });
   });
 

@@ -95,7 +95,10 @@ describe "Collector (Toggling)", ->
     @widget.remove()
 
   it "should render the displayer and options menu withing a wrapper", ->
-    expect(@widget.collector('container')).toBeVisible()
+    expect(@widget.collector('container')).toExist()
+    expect(@widget.collector('container')).toContain 'select'
+    expect(@widget.collector('container')).toContain 'a.collector-display'
+    expect(@widget.collector('container')).toContain 'ul.collector-options'
 
   it "should hide the options menu by default", ->
     expect(@widget.collector('container')).toHaveClass 'collector-closed'
@@ -138,6 +141,11 @@ describe "Collector (Toggling)", ->
     @widget.collector('display').click() # open
     @widget.collector('display').click() # close
     expect('collectorclose').toHaveBeenTriggeredOn(@widget)
+
+  it "should cleanup nicely put the original element back and remove the container", ->
+    @widget.collector 'destroy'
+    expect(@widget.collector('container')).not.toExist()
+    expect(@widget).toBeVisible()
 
 
 

@@ -55,7 +55,7 @@ class FugaSelectBase
 
   _generateMenu: (options) ->
     options ||= @_availableOptions()
-    menu = $ '<ul></ul>'
+    menu = $('<ul></ul>').addClass('collector-options')
     self = this
     $.each options, (index, option) -> self._generateMenuOption(option).appendTo(menu)
     return menu
@@ -87,11 +87,13 @@ class FugaSelectDisplay extends FugaSelectBase
     super()
 
   _createDisplay: ->
-    @display_el.remove() if @display_el
-    @display_el = $('<a></a>').attr('href', '#').attr('onclick', 'return false').insertAfter(@element).text @_displayText()
+    @_removeDisplay()
+    @display_el = $('<a></a>').attr('href', '#').attr('onclick', 'return false').addClass('collector-display').insertAfter(@element) #.html(@_displayText())
+    # chaining this in the above line causes some unexpected behaviour...
+    @display().text @_displayText()
 
   _removeDisplay: ->
-    @display_el.remove() if @display_el
+    @display().remove() if @display()
     @display_el = null
 
   _selectedOption: ->
@@ -107,7 +109,7 @@ class FugaSelectDisplay extends FugaSelectBase
 
   _displayText: ->
     return @_selectedOption().label if @_selectedOption() && @_selectedOption().label != ''
-    @options.placeholder
+    return @options.placeholder
 
   display: ->
     @display_el
@@ -126,18 +128,23 @@ class FugaSelectToggler extends FugaSelectDisplay
 
   _createContainer: ->
     # remove any existing container
-    @_removeContainer() if @container_el
+    @_removeContainer()
     @container_el = $('<div />').addClass('collector-container').addClass('collector-closed').insertAfter(@element)
 
-    # append the display and menu element created by parent classes inside the container
-    if @display()
-      @display().appendTo @container_el
-    
-    if @menu()
-      @menu().appendTo @container_el 
+    # append the original control and the display and menu elements created by parent classes inside the container
+    @element.appendTo(@container())
+    @display().appendTo(@container()) if @display()
+    @menu().appendTo(@container()) if @menu()
 
   _removeContainer: ->
-    @container_el.remove() if @container_el
+    if @container()
+      # move the original element, the display and menu neatly back outside of the container
+      @element.insertBefore(@container())
+      @display().insertBefore(@container()) if @display()
+      @menu().insertBefore(@container()) if @menu()
+
+      # now remove container
+      @container().remove()
     @container_el = null
 
   _setupBindings: ->
