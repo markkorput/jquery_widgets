@@ -144,7 +144,7 @@
     FugaSelectDisplay.prototype._createDisplay = function() {
       this._removeDisplay();
       this.display_el = $('<a></a>').attr('href', '#').attr('onclick', 'return false').addClass('cllctr-display').insertAfter(this.element);
-      return this.display().text(this._displayText());
+      return this.display().append($('<span></span>').text(this._displayText())).append($("<div><b></b></div>"));
     };
 
     FugaSelectDisplay.prototype._removeDisplay = function() {
@@ -204,8 +204,9 @@
       this._removeContainer();
       this.container_el = $('<div />').addClass('cllctr-container').addClass('cllctr-collapsed').insertAfter(this.element);
       this.element.appendTo(this.container());
-      if (this.display()) this.display().appendTo(this.container());
-      if (this.menu()) return this.menu().appendTo(this.container());
+      if (this.display()) this.container().append(this.display());
+      this.container().append($('<div />').addClass('cllctr-drawer'));
+      if (this.menu()) return this.drawer().append(this.menu());
     };
 
     FugaSelectToggler.prototype._removeContainer = function() {
@@ -213,6 +214,7 @@
         this.element.insertBefore(this.container());
         if (this.display()) this.display().insertBefore(this.container());
         if (this.menu()) this.menu().insertBefore(this.container());
+        if (this.drawer()) this.drawer().remove();
         this.container().remove();
       }
       return this.container_el = null;
@@ -241,6 +243,10 @@
 
     FugaSelectToggler.prototype.container = function() {
       return this.container_el;
+    };
+
+    FugaSelectToggler.prototype.drawer = function() {
+      if (this.container()) return this.container().find('.cllctr-drawer');
     };
 
     FugaSelectToggler.prototype.toggle = function() {
@@ -328,7 +334,7 @@
       var searcher;
       FugaSelect.__super__._createElements.call(this);
       if (this.options.allow_search === true) {
-        searcher = $('<input>').attr('type', 'text').addClass('cllctr-searcher');
+        searcher = $('<div />').addClass('cllctr-search').append($('<input>').attr('type', 'text').addClass('cllctr-searcher'));
         if (this.menu) {
           return this.menu().before(searcher);
         } else {
@@ -355,7 +361,9 @@
     };
 
     FugaSelect.prototype.searcher = function() {
-      if (this.container()) return this.container().find('input.cllctr-searcher');
+      if (this.container()) {
+        return this.drawer().find('.cllctr-search input.cllctr-searcher');
+      }
     };
 
     FugaSelect.prototype._handleSearcherTyping = function(event) {

@@ -94,9 +94,14 @@ class FugaSelectDisplay extends FugaSelectBase
 
   _createDisplay: ->
     @_removeDisplay()
-    @display_el = $('<a></a>').attr('href', '#').attr('onclick', 'return false').addClass('cllctr-display').insertAfter(@element) #.html(@_displayText())
+    @display_el = $('<a></a>').
+      attr('href', '#').
+      attr('onclick', 'return false').
+      addClass('cllctr-display').
+      insertAfter(@element)
+    
     # chaining this in the above line causes some unexpected behaviour...
-    @display().text @_displayText()
+    @display().append( $('<span></span>').text(@_displayText()) ).append $("<div><b></b></div>")
 
   _removeDisplay: ->
     @display().remove() if @display()
@@ -136,12 +141,16 @@ class FugaSelectToggler extends FugaSelectDisplay
   _createContainer: ->
     # remove any existing container
     @_removeContainer()
+    # create the container element and insert it after the original element
     @container_el = $('<div />').addClass('cllctr-container').addClass('cllctr-collapsed').insertAfter(@element)
-
-    # append the original control and the display and menu elements created by parent classes inside the container
-    @element.appendTo(@container())
-    @display().appendTo(@container()) if @display()
-    @menu().appendTo(@container()) if @menu()
+    # append the original control inside the container
+    @element.appendTo @container()
+    # append the display in the container
+    @container().append @display() if @display()
+    # add the drawer
+    @container().append $('<div />').addClass('cllctr-drawer')
+    # add the options menu to the drawer
+    @drawer().append @menu() if @menu()
 
   _removeContainer: ->
     if @container()
@@ -149,6 +158,7 @@ class FugaSelectToggler extends FugaSelectDisplay
       @element.insertBefore(@container())
       @display().insertBefore(@container()) if @display()
       @menu().insertBefore(@container()) if @menu()
+      @drawer().remove() if @drawer()
 
       # now remove container
       @container().remove()
@@ -171,6 +181,8 @@ class FugaSelectToggler extends FugaSelectDisplay
     @close()
 
   container: -> @container_el
+
+  drawer: -> @container().find('.cllctr-drawer') if @container()
 
   toggle: ->
     if @is_open()
@@ -216,7 +228,7 @@ class FugaSelect extends FugaSelectRemover
     super()
     # search must be explicitly enabled
     if @options.allow_search == true
-      searcher = $('<input>').attr('type', 'text').addClass('cllctr-searcher') 
+      searcher = $('<div />').addClass('cllctr-search').append $('<input>').attr('type', 'text').addClass('cllctr-searcher') 
       if @menu # add right before options menu if there's an options menu
         @menu().before searcher
       else # otherwise simply add to the end of the widget's container
@@ -235,7 +247,7 @@ class FugaSelect extends FugaSelectRemover
     super()
 
   searcher: ->
-    @container().find('input.cllctr-searcher') if @container()
+    @drawer().find('.cllctr-search input.cllctr-searcher') if @container()
 
   _handleSearcherTyping: (event) ->
     @search(@searcher().val()) if @_trigger 'search', event, @searcher().val()
