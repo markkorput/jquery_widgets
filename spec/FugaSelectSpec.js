@@ -230,24 +230,7 @@
 
   describe("Collector (Searching)", function() {
     beforeEach(function() {
-      this.choices = [
-        {
-          value: 1,
-          label: 'first'
-        }, {
-          value: 2,
-          label: 'second'
-        }, {
-          value: 3,
-          label: 'third'
-        }, {
-          value: 4,
-          label: 'fourth'
-        }, {
-          value: 5,
-          label: 'fifth'
-        }
-      ];
+      this.choices = ['first', 'second', 'third', 'fourth', 'fifth'];
       return this.widget = $('<div id="dummy">&nbsp;</div>').appendTo($('body')).collector({
         options: this.choices,
         allow_search: true
@@ -305,7 +288,7 @@
       expect(this.widget.collector('menu').find('li:eq(3)')).not.toHaveClass('cllctr-filtered');
       return expect(this.widget.collector('menu').find('li:eq(4)')).not.toHaveClass('cllctr-filtered');
     });
-    return it("should not render the search field by default", function() {
+    it("should not render the search field by default", function() {
       var widget2;
       widget2 = $('<div id="dummy">&nbsp</div>').appendTo($('body')).collector({
         options: [
@@ -323,6 +306,10 @@
         return widget2.remove();
       });
       return expect(widget2.collector('searcher')).not.toExist();
+    });
+    return it("should emphasize matched text in option labels", function() {
+      this.widget.collector('search', 'our');
+      return expect(this.widget.collector('menu').find('li:eq(3)').html()).toContain('f<em>our</em>th');
     });
   });
 

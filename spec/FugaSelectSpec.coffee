@@ -209,7 +209,8 @@ describe "Collector (Removing)", ->
 describe "Collector (Searching)", ->
 
   beforeEach ->
-    @choices = [{value: 1, label: 'first'}, {value: 2, label: 'second'}, {value: 3, label: 'third'}, {value: 4, label: 'fourth'}, {value: 5, label: 'fifth'}]
+    # @choices = [{value: 1, label: 'first'}, {value: 2, label: 'second'}, {value: 3, label: 'third'}, {value: 4, label: 'fourth'}, {value: 5, label: 'fifth'}]
+    @choices = ['first', 'second', 'third', 'fourth', 'fifth']
     @widget = $('<div id="dummy">&nbsp;</div>').appendTo($('body')).collector
       options: @choices,
       allow_search: true
@@ -270,3 +271,7 @@ describe "Collector (Searching)", ->
     widget2 = $('<div id="dummy">&nbsp</div>').appendTo($('body')).collector {options: [{value: 1, label: 'one'}, {value: 2, label: 'two'}]}
     @after -> widget2.collector('destroy'); widget2.remove();
     expect(widget2.collector('searcher')).not.toExist()
+
+  it "should emphasize matched text in option labels", ->
+    @widget.collector('search', 'our')
+    expect(@widget.collector('menu').find('li:eq(3)').html()).toContain 'f<em>our</em>th'

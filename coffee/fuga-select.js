@@ -24,7 +24,8 @@
 
     FugaSelectBase.prototype._createElements = function() {
       if (this.menu_el) this.menu_el.remove();
-      return this.menu_el = this._generateMenu().insertAfter(this.element);
+      this.menu_el = $('<ul></ul>').addClass('cllctr-options').insertAfter(this.element);
+      return this._renderMenuContent();
     };
 
     FugaSelectBase.prototype._removeElements = function() {
@@ -51,7 +52,7 @@
       var value;
       if ($(event.target).is('li')) {
         event.preventDefault();
-        value = $(event.target).attr('value');
+        value = $(event.target).attr('data-cllctr-value');
         if (this._trigger('select', event, value)) return this._setValue(value);
       }
     };
@@ -77,6 +78,12 @@
     };
 
     FugaSelectBase.prototype._normalizeOption = function(option) {
+      if (typeof option === 'string') {
+        return {
+          value: option,
+          label: option
+        };
+      }
       option.value = '' + option.value;
       return option;
     };
@@ -95,19 +102,19 @@
       });
     };
 
-    FugaSelectBase.prototype._generateMenu = function(options) {
-      var menu, self;
-      options || (options = this._options());
-      menu = $('<ul></ul>').addClass('cllctr-options');
-      self = this;
-      $.each(options, function(index, option) {
-        return self._generateMenuOption(option).appendTo(menu);
-      });
-      return menu;
+    FugaSelectBase.prototype._renderMenuContent = function() {
+      var option, _i, _len, _ref, _results;
+      _ref = this._options();
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        option = _ref[_i];
+        _results.push(this.menu().append(this._generateMenuOption(option)));
+      }
+      return _results;
     };
 
     FugaSelectBase.prototype._generateMenuOption = function(option) {
-      return $('<li></li>').attr('value', option.value).text(option.label);
+      return $('<li></li>').attr('data-cllctr-value', option.value).append($('<span />').text(option.label));
     };
 
     FugaSelectBase.prototype.value = function(new_value) {
@@ -301,7 +308,7 @@
       var value;
       if ($(event.target).is('abbr.cllctr-remove')) {
         event.preventDefault();
-        value = $(event.target).parent('li').attr('value');
+        value = $(event.target).parent('li').attr('data-cllctr-value');
         if (this._trigger('remove', event, value)) {
           return this.remove_option(value);
         }
@@ -311,11 +318,11 @@
     };
 
     FugaSelectRemover.prototype.remove_option = function(value) {
-      return this.menu().find('li[value=' + value + ']').addClass('cllctr-removed');
+      return this.menu().find('li[data-cllctr-value=' + value + ']').addClass('cllctr-removed');
     };
 
     FugaSelectRemover.prototype.unremove_option = function(value) {
-      return this.menu().find('li[value=' + value + ']').removeClass('cllctr-removed');
+      return this.menu().find('li[data-cllctr-value=' + value + ']').removeClass('cllctr-removed');
     };
 
     return FugaSelectRemover;
@@ -375,7 +382,9 @@
     FugaSelect.prototype.search = function(value) {
       if (this.searcher()) this.searcher().val(value);
       this._determineFilteredStates(value);
-      this._distributeFilteredStates();
+      this._applySearch({
+        search_value: value
+      });
       return this.container().addClass('cllctr-filtered');
     };
 
@@ -394,16 +403,20 @@
       return _results;
     };
 
-    FugaSelect.prototype._distributeFilteredStates = function() {
-      var option, _i, _len, _ref, _results;
+    FugaSelect.prototype._applySearch = function(params) {
+      var li, option, _i, _len, _ref, _results;
       _ref = this._options();
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         option = _ref[_i];
+        li = this.menu().find('li[data-cllctr-value=' + option.value + ']');
+        if (params && params.search_value) {
+          li.find('span').html(li.find('span').text().replace(params.search_value, "<em>" + params.search_value + "</em>"));
+        }
         if (option.filtered === true) {
-          _results.push(this.menu().find('li[value=' + option.value + ']').addClass('cllctr-filtered'));
+          _results.push(li.addClass('cllctr-filtered'));
         } else {
-          _results.push(this.menu().find('li[value=' + option.value + ']').removeClass('cllctr-filtered'));
+          _results.push(li.removeClass('cllctr-filtered'));
         }
       }
       return _results;

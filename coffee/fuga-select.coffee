@@ -15,7 +15,8 @@ class FugaSelectBase
 
   _createElements: ->
     @menu_el.remove() if @menu_el
-    @menu_el = @_generateMenu().insertAfter @element
+    @menu_el = $('<ul></ul>').addClass('cllctr-options').insertAfter @element
+    @_renderMenuContent()
 
   _removeElements: ->
     @menu_el.remove() if @menu_el
@@ -34,7 +35,7 @@ class FugaSelectBase
   _handleMenuClick: (event) ->
     if $(event.target).is('li')
       event.preventDefault()
-      value = $(event.target).attr('value')
+      value = $(event.target).attr('data-cllctr-value')
       if @_trigger 'select', event, value
         @_setValue value
 
@@ -51,6 +52,7 @@ class FugaSelectBase
 
   # todo; this should do more; like create value attribute, when there's only a label attribute, or turn strings into value/label objects
   _normalizeOption: (option) ->
+    return {value: option, label: option} if typeof(option) == 'string'
     option.value = (''+option.value)
     return option
 
@@ -62,15 +64,11 @@ class FugaSelectBase
       value: $(option).attr('value')
       label: $(option).text()
 
-  _generateMenu: (options) ->
-    options ||= @_options()
-    menu = $('<ul></ul>').addClass('cllctr-options')
-    self = this
-    $.each options, (index, option) -> self._generateMenuOption(option).appendTo(menu)
-    return menu
+  _renderMenuContent: ->
+    for option in @_options()
+      @menu().append @_generateMenuOption(option)
 
-  _generateMenuOption: (option) ->
-    $('<li></li>').attr('value', option.value).text(option.label)
+  _generateMenuOption: (option) -> $('<li></li>').attr('data-cllctr-value', option.value).append $('<span />').text(option.label)
 
   value: (new_value) ->
     return @_setValue(new_value) if new_value
@@ -211,13 +209,13 @@ class FugaSelectRemover extends FugaSelectToggler
   _handleMenuClick: (event) ->
     if $(event.target).is('abbr.cllctr-remove')
       event.preventDefault()
-      value = $(event.target).parent('li').attr('value')
+      value = $(event.target).parent('li').attr('data-cllctr-value')
       @remove_option(value) if @_trigger 'remove', event, value
     else
       super(event)
 
-  remove_option: (value) -> @menu().find('li[value='+value+']').addClass('cllctr-removed')
-  unremove_option: (value) -> @menu().find('li[value='+value+']').removeClass('cllctr-removed')
+  remove_option: (value) -> @menu().find('li[data-cllctr-value='+value+']').addClass('cllctr-removed')
+  unremove_option: (value) -> @menu().find('li[data-cllctr-value='+value+']').removeClass('cllctr-removed')
 
 
 
@@ -259,7 +257,7 @@ class FugaSelect extends FugaSelectRemover
     # set the filtered attribute for each option (in-memory)
     @_determineFilteredStates(value)
     # set menu option classes according to the inmemory options' filtered states
-    @_distributeFilteredStates()
+    @_applySearch({search_value: value})
 
     # TODO go through all available options, set unbinding options to filtered and update menu item classes
     @container().addClass 'cllctr-filtered'
@@ -272,14 +270,20 @@ class FugaSelect extends FugaSelectRemover
         option.filtered = false
       else
         option.filtered = true 
-    
-  _distributeFilteredStates: ->
-    # apply filtered status to internal (in-memory) option-objects
+
+  # applies search states to the menu's option items
+  _applySearch: (params) ->
+    # set dom classes according to filtered state of in memory option objects
     for option in @_options()
+      li = @menu().find('li[data-cllctr-value='+option.value+']')
+      # put <em> tags around the matched part of the text
+      li.find('span').html li.find('span').text().replace(params.search_value, "<em>"+params.search_value+"</em>") if params && params.search_value
+      # add a filtered class to filtered options
       if option.filtered == true
-        @menu().find('li[value='+option.value+']').addClass('cllctr-filtered')
+        li.addClass('cllctr-filtered')
       else
-        @menu().find('li[value='+option.value+']').removeClass('cllctr-filtered')
+        li.removeClass('cllctr-filtered')
+
 
   _matchOption: (option, value) -> option.label.indexOf(''+value) != -1
 
