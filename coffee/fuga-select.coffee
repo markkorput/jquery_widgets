@@ -64,7 +64,7 @@ class FugaSelectBase
 
   _generateMenu: (options) ->
     options ||= @_options()
-    menu = $('<ul></ul>').addClass('collector-options')
+    menu = $('<ul></ul>').addClass('cllctr-options')
     self = this
     $.each options, (index, option) -> self._generateMenuOption(option).appendTo(menu)
     return menu
@@ -95,7 +95,7 @@ class FugaSelectDisplay extends FugaSelectBase
 
   _createDisplay: ->
     @_removeDisplay()
-    @display_el = $('<a></a>').attr('href', '#').attr('onclick', 'return false').addClass('collector-display').insertAfter(@element) #.html(@_displayText())
+    @display_el = $('<a></a>').attr('href', '#').attr('onclick', 'return false').addClass('cllctr-display').insertAfter(@element) #.html(@_displayText())
     # chaining this in the above line causes some unexpected behaviour...
     @display().text @_displayText()
 
@@ -137,7 +137,7 @@ class FugaSelectToggler extends FugaSelectDisplay
   _createContainer: ->
     # remove any existing container
     @_removeContainer()
-    @container_el = $('<div />').addClass('collector-container').addClass('collector-closed').insertAfter(@element)
+    @container_el = $('<div />').addClass('cllctr-container').addClass('cllctr-closed').insertAfter(@element)
 
     # append the original control and the display and menu elements created by parent classes inside the container
     @element.appendTo(@container())
@@ -167,6 +167,10 @@ class FugaSelectToggler extends FugaSelectDisplay
   _handleDisplayClick: ->
     @toggle()
 
+  _handleMenuClick: (event) ->
+    super(event)
+    @close()
+
   container: -> @container_el
 
   toggle: ->
@@ -175,15 +179,15 @@ class FugaSelectToggler extends FugaSelectDisplay
     else
       @open()
 
-  is_open: () -> @container() && @container().hasClass('collector-open')
+  is_open: () -> @container() && @container().hasClass('cllctr-open')
 
   open: ->
     if @_trigger 'open'
-      @container().removeClass('collector-closed').addClass('collector-open')
+      @container().removeClass('cllctr-closed').addClass('cllctr-open')
 
   close: ->
     if @_trigger 'close'
-      @container().removeClass('collector-open').addClass('collector-closed')
+      @container().removeClass('cllctr-open').addClass('cllctr-closed')
 
 
 class FugaSelectRemover extends FugaSelectToggler
@@ -191,18 +195,18 @@ class FugaSelectRemover extends FugaSelectToggler
 
   _generateMenuOption: (option) ->
     return super(option) if @options.allow_remove != true
-    return super(option).append($('<a></a>').attr('href', '#').addClass('collector-remove').text(@options.remove_text))
+    return super(option).append($('<a></a>').attr('href', '#').addClass('cllctr-remove').text(@options.remove_text))
 
   _handleMenuClick: (event) ->
-    if $(event.target).is('a.collector-remove')
+    if $(event.target).is('a.cllctr-remove')
       event.preventDefault()
       value = $(event.target).parent('li').attr('value')
       @remove_option(value) if @_trigger 'remove', event, value
     else
       super(event)
 
-  remove_option: (value) -> @menu().find('li[value='+value+']').addClass('collector-removed')
-  unremove_option: (value) -> @menu().find('li[value='+value+']').removeClass('collector-removed')
+  remove_option: (value) -> @menu().find('li[value='+value+']').addClass('cllctr-removed')
+  unremove_option: (value) -> @menu().find('li[value='+value+']').removeClass('cllctr-removed')
 
 
 
@@ -213,7 +217,7 @@ class FugaSelect extends FugaSelectRemover
     super()
     # search must be explicitly enabled
     if @options.allow_search == true
-      searcher = $('<input>').attr('type', 'text').addClass('collector-searcher') 
+      searcher = $('<input>').attr('type', 'text').addClass('cllctr-searcher') 
       if @menu # add right before options menu if there's an options menu
         @menu().before searcher
       else # otherwise simply add to the end of the widget's container
@@ -232,7 +236,7 @@ class FugaSelect extends FugaSelectRemover
     super()
 
   searcher: ->
-    @container().find('input.collector-searcher') if @container()
+    @container().find('input.cllctr-searcher') if @container()
 
   _handleSearcherTyping: (event) ->
     @search(@searcher().val()) if @_trigger 'search', event, @searcher().val()
@@ -247,7 +251,7 @@ class FugaSelect extends FugaSelectRemover
     @_distributeFilteredStates()
 
     # TODO go through all available options, set unmatching options to filtered and update menu item classes
-    @container().addClass 'collector-filtered'
+    @container().addClass 'cllctr-filtered'
 
   _determineFilteredStates: (value) ->
     # apply filtered status to internal (in-memory) option-objects
@@ -262,15 +266,15 @@ class FugaSelect extends FugaSelectRemover
     # apply filtered status to internal (in-memory) option-objects
     for option in @_options()
       if option.filtered == true
-        @menu().find('li[value='+option.value+']').addClass('collector-filtered')
+        @menu().find('li[value='+option.value+']').addClass('cllctr-filtered')
       else
-        @menu().find('li[value='+option.value+']').removeClass('collector-filtered')
+        @menu().find('li[value='+option.value+']').removeClass('cllctr-filtered')
 
   _matchOption: (option, value) -> option.label.indexOf(''+value) != -1
 
   unfilter: ->
     # TODO; remove filter classes form the individual items?
-    @container().removeClass 'collector-filtered'
+    @container().removeClass 'cllctr-filtered'
 
 
 # register jquery widget from CautiousWidget class

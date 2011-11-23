@@ -1,0 +1,9 @@
+/* hide remove options */
+.cllctr-container li.cllctr-removed{display: none;}
+
+/* hide options when widget is closed */
+.cllctr-container.cllctr-closed ul.cllctr-options{display: none;}
+
+/* hide not-mtching (filtered) options when searching is active */
+.cllctr-container.cllctr-filtered li.cllctr-filtered{display: none;}
+

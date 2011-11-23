@@ -67,7 +67,7 @@ describe "Collector (Display)", ->
     @widget.remove()
 
   it "should render a value displayer", ->
-    expect(@widget.collector('display')).toBeVisible()
+    expect(@widget.collector('display')).toExist()
 
   it "should remove the value displayer at destroy", ->
     @widget.collector('destroy')
@@ -99,29 +99,29 @@ describe "Collector (Toggling)", ->
   it "should render the displayer and options menu withing a wrapper", ->
     expect(@widget.collector('container')).toExist()
     expect(@widget.collector('container')).toContain 'select'
-    expect(@widget.collector('container')).toContain 'a.collector-display'
-    expect(@widget.collector('container')).toContain 'ul.collector-options'
+    expect(@widget.collector('container')).toContain 'a.cllctr-display'
+    expect(@widget.collector('container')).toContain 'ul.cllctr-options'
 
   it "should hide the options menu by default", ->
-    expect(@widget.collector('container')).toHaveClass 'collector-closed'
+    expect(@widget.collector('container')).toHaveClass 'cllctr-closed'
 
   it "should toggle the options menu when clicking on the display", ->
     @widget.collector('display').click()
-    expect(@widget.collector('container')).toHaveClass 'collector-open'
-    expect(@widget.collector('container')).not.toHaveClass 'collector-closed'
+    expect(@widget.collector('container')).toHaveClass 'cllctr-open'
+    expect(@widget.collector('container')).not.toHaveClass 'cllctr-closed'
     @widget.collector('display').click()
-    expect(@widget.collector('container')).toHaveClass 'collector-closed'
-    expect(@widget.collector('container')).not.toHaveClass 'collector-open'
+    expect(@widget.collector('container')).toHaveClass 'cllctr-closed'
+    expect(@widget.collector('container')).not.toHaveClass 'cllctr-open'
 
   it "should provide open and close methods", ->
     @widget.collector('open')
-    expect(@widget.collector('container')).toHaveClass 'collector-open'
+    expect(@widget.collector('container')).toHaveClass 'cllctr-open'
     @widget.collector('close')
-    expect(@widget.collector('container')).toHaveClass 'collector-closed'
+    expect(@widget.collector('container')).toHaveClass 'cllctr-closed'
 
   it "should trigger open events", ->
     @widget.collector('open')
-    expect(@widget.collector('container')).toHaveClass 'collector-open'
+    expect(@widget.collector('container')).toHaveClass 'cllctr-open'
     
   it "should trigger an open event when the menu opens through the method", ->
     spyOnEvent(@widget, 'collectoropen')
@@ -144,6 +144,12 @@ describe "Collector (Toggling)", ->
     @widget.collector('display').click() # close
     expect('collectorclose').toHaveBeenTriggeredOn(@widget)
 
+  it "should close the options menu when an option is selected", ->
+    @widget.collector('open')
+    expect(@widget.collector('container')).toHaveClass 'cllctr-open'
+    @widget.collector('menu').find('li:first a:first').click()
+    expect(@widget.collector('container')).toHaveClass 'cllctr-closed'
+
   it "should cleanup nicely put the original element back and remove the container", ->
     @widget.collector 'destroy'
     expect(@widget.collector('container')).not.toExist()
@@ -165,38 +171,38 @@ describe "Collector (Removing)", ->
     @widget.remove()
 
   it "should add delete links to each menu item", ->
-    expect(@widget.collector('menu').find('li a.collector-remove').length).toEqual 3
+    expect(@widget.collector('menu').find('li a.cllctr-remove').length).toEqual 3
 
   it "should provide a remove_text option that specifies remove link content", ->
-    expect(@widget.collector('menu').find('li:first a.collector-remove').text()).toEqual 'Get rid of this!'
+    expect(@widget.collector('menu').find('li:first a.cllctr-remove').text()).toEqual 'Get rid of this!'
 
   it "should trigger a remove event when a remove link is clicked", ->
     spyOnEvent(@widget, 'collectorremove')
-    @widget.collector('menu').find('li:first a.collector-remove').click()
+    @widget.collector('menu').find('li:first a.cllctr-remove').click()
     expect('collectorremove').toHaveBeenTriggeredOn(@widget)
 
-  it "should add the collector-removed class to removed items", ->
+  it "should add the cllctr-removed class to removed items", ->
     li = @widget.collector('menu').find('li:eq(1)')
-    expect(li).not.toHaveClass 'collector-removed'
-    li.find('a.collector-remove').click()
-    expect(li).toHaveClass 'collector-removed'
+    expect(li).not.toHaveClass 'cllctr-removed'
+    li.find('a.cllctr-remove').click()
+    expect(li).toHaveClass 'cllctr-removed'
 
   it "should provide easy value-based interface to manually remove options", ->
-    expect(@widget.collector('menu').find('li:last')).not.toHaveClass 'collector-removed'
+    expect(@widget.collector('menu').find('li:last')).not.toHaveClass 'cllctr-removed'
     @widget.collector 'remove_option', '3'
-    expect(@widget.collector('menu').find('li:last')).toHaveClass 'collector-removed'
+    expect(@widget.collector('menu').find('li:last')).toHaveClass 'cllctr-removed'
 
   it "should provide easy value-based interface to unremove options", ->
-    expect(@widget.collector('menu').find('li:last')).not.toHaveClass 'collector-removed'
+    expect(@widget.collector('menu').find('li:last')).not.toHaveClass 'cllctr-removed'
     @widget.collector 'remove_option', '3'
-    expect(@widget.collector('menu').find('li:last')).toHaveClass 'collector-removed'
+    expect(@widget.collector('menu').find('li:last')).toHaveClass 'cllctr-removed'
     @widget.collector 'unremove_option', '3'
-    expect(@widget.collector('menu').find('li:last')).not.toHaveClass 'collector-removed'
+    expect(@widget.collector('menu').find('li:last')).not.toHaveClass 'cllctr-removed'
 
   it "shouldn't add the remove links by default", ->
     widget2 = $('<select><option value="1">first</option><option value="2">second</option><option value="3">third</option></select>').appendTo($('body')).collector()
     @after -> widget2.collector('destroy'); widget2.remove()
-    expect(widget2.collector('menu').find('li a.collector-remove')).not.toExist()
+    expect(widget2.collector('menu').find('li a.cllctr-remove')).not.toExist()
 
 
 
@@ -216,7 +222,7 @@ describe "Collector (Searching)", ->
     expect(@widget.collector('searcher')).toExist()
 
   it "should add the searcher to the container", ->
-    expect(@widget.collector('container')).toContain 'input.collector-searcher'
+    expect(@widget.collector('container')).toContain 'input.cllctr-searcher'
 
   it "should trigger a search event with the search value when there's typing in the search field", ->
     # this should receive the right value
@@ -231,34 +237,34 @@ describe "Collector (Searching)", ->
     # check if our custom callback was triggered with the right value
     expect(callback_value).toEqual 'testSearch'
 
-  it "should add the collector-filtered class to the widget container when searching for a value", ->
-    expect(@widget.collector('container')).not.toHaveClass 'collector-filtered'
+  it "should add the cllctr-filtered class to the widget container when searching for a value", ->
+    expect(@widget.collector('container')).not.toHaveClass 'cllctr-filtered'
     @widget.collector('searcher').keyup()
-    expect(@widget.collector('container')).toHaveClass 'collector-filtered'
+    expect(@widget.collector('container')).toHaveClass 'cllctr-filtered'
 
   it "should provide a manual search method", ->
-    expect(@widget.collector('container')).not.toHaveClass 'collector-filtered'
+    expect(@widget.collector('container')).not.toHaveClass 'cllctr-filtered'
     @widget.collector('search', 'something')
-    expect(@widget.collector('container')).toHaveClass 'collector-filtered'
+    expect(@widget.collector('container')).toHaveClass 'cllctr-filtered'
 
   it "should provide an unfilter method", ->
     @widget.collector 'search', 'filter_text'
-    expect(@widget.collector('container')).toHaveClass 'collector-filtered'
+    expect(@widget.collector('container')).toHaveClass 'cllctr-filtered'
     @widget.collector 'unfilter'
-    expect(@widget.collector('container')).not.toHaveClass 'collector-filtered'
+    expect(@widget.collector('container')).not.toHaveClass 'cllctr-filtered'
 
-  it "should add a collector-filtered class to menu options who's label that don't match the search value", ->
-    expect(@widget.collector('menu').find('li:eq(0)')).not.toHaveClass 'collector-filtered'
-    expect(@widget.collector('menu').find('li:eq(1)')).not.toHaveClass 'collector-filtered'
-    expect(@widget.collector('menu').find('li:eq(2)')).not.toHaveClass 'collector-filtered'
-    expect(@widget.collector('menu').find('li:eq(3)')).not.toHaveClass 'collector-filtered'
-    expect(@widget.collector('menu').find('li:eq(4)')).not.toHaveClass 'collector-filtered'
+  it "should add a cllctr-filtered class to menu options who's label that don't match the search value", ->
+    expect(@widget.collector('menu').find('li:eq(0)')).not.toHaveClass 'cllctr-filtered'
+    expect(@widget.collector('menu').find('li:eq(1)')).not.toHaveClass 'cllctr-filtered'
+    expect(@widget.collector('menu').find('li:eq(2)')).not.toHaveClass 'cllctr-filtered'
+    expect(@widget.collector('menu').find('li:eq(3)')).not.toHaveClass 'cllctr-filtered'
+    expect(@widget.collector('menu').find('li:eq(4)')).not.toHaveClass 'cllctr-filtered'
     @widget.collector 'search', 'th'
-    expect(@widget.collector('menu').find('li:eq(0)')).toHaveClass 'collector-filtered'
-    expect(@widget.collector('menu').find('li:eq(1)')).toHaveClass 'collector-filtered'
-    expect(@widget.collector('menu').find('li:eq(2)')).not.toHaveClass 'collector-filtered'
-    expect(@widget.collector('menu').find('li:eq(3)')).not.toHaveClass 'collector-filtered'
-    expect(@widget.collector('menu').find('li:eq(4)')).not.toHaveClass 'collector-filtered'
+    expect(@widget.collector('menu').find('li:eq(0)')).toHaveClass 'cllctr-filtered'
+    expect(@widget.collector('menu').find('li:eq(1)')).toHaveClass 'cllctr-filtered'
+    expect(@widget.collector('menu').find('li:eq(2)')).not.toHaveClass 'cllctr-filtered'
+    expect(@widget.collector('menu').find('li:eq(3)')).not.toHaveClass 'cllctr-filtered'
+    expect(@widget.collector('menu').find('li:eq(4)')).not.toHaveClass 'cllctr-filtered'
 
   it "should not render the search field by default", ->
     widget2 = $('<div id="dummy">&nbsp</div>').appendTo($('body')).collector {options: [{value: 1, label: 'one'}, {value: 2, label: 'two'}]}

@@ -82,7 +82,7 @@
       return this.widget.remove();
     });
     it("should render a value displayer", function() {
-      return expect(this.widget.collector('display')).toBeVisible();
+      return expect(this.widget.collector('display')).toExist();
     });
     it("should remove the value displayer at destroy", function() {
       this.widget.collector('destroy');
@@ -117,29 +117,29 @@
     it("should render the displayer and options menu withing a wrapper", function() {
       expect(this.widget.collector('container')).toExist();
       expect(this.widget.collector('container')).toContain('select');
-      expect(this.widget.collector('container')).toContain('a.collector-display');
-      return expect(this.widget.collector('container')).toContain('ul.collector-options');
+      expect(this.widget.collector('container')).toContain('a.cllctr-display');
+      return expect(this.widget.collector('container')).toContain('ul.cllctr-options');
     });
     it("should hide the options menu by default", function() {
-      return expect(this.widget.collector('container')).toHaveClass('collector-closed');
+      return expect(this.widget.collector('container')).toHaveClass('cllctr-closed');
     });
     it("should toggle the options menu when clicking on the display", function() {
       this.widget.collector('display').click();
-      expect(this.widget.collector('container')).toHaveClass('collector-open');
-      expect(this.widget.collector('container')).not.toHaveClass('collector-closed');
+      expect(this.widget.collector('container')).toHaveClass('cllctr-open');
+      expect(this.widget.collector('container')).not.toHaveClass('cllctr-closed');
       this.widget.collector('display').click();
-      expect(this.widget.collector('container')).toHaveClass('collector-closed');
-      return expect(this.widget.collector('container')).not.toHaveClass('collector-open');
+      expect(this.widget.collector('container')).toHaveClass('cllctr-closed');
+      return expect(this.widget.collector('container')).not.toHaveClass('cllctr-open');
     });
     it("should provide open and close methods", function() {
       this.widget.collector('open');
-      expect(this.widget.collector('container')).toHaveClass('collector-open');
+      expect(this.widget.collector('container')).toHaveClass('cllctr-open');
       this.widget.collector('close');
-      return expect(this.widget.collector('container')).toHaveClass('collector-closed');
+      return expect(this.widget.collector('container')).toHaveClass('cllctr-closed');
     });
     it("should trigger open events", function() {
       this.widget.collector('open');
-      return expect(this.widget.collector('container')).toHaveClass('collector-open');
+      return expect(this.widget.collector('container')).toHaveClass('cllctr-open');
     });
     it("should trigger an open event when the menu opens through the method", function() {
       spyOnEvent(this.widget, 'collectoropen');
@@ -162,6 +162,12 @@
       this.widget.collector('display').click();
       return expect('collectorclose').toHaveBeenTriggeredOn(this.widget);
     });
+    it("should close the options menu when an option is selected", function() {
+      this.widget.collector('open');
+      expect(this.widget.collector('container')).toHaveClass('cllctr-open');
+      this.widget.collector('menu').find('li:first a:first').click();
+      return expect(this.widget.collector('container')).toHaveClass('cllctr-closed');
+    });
     return it("should cleanup nicely put the original element back and remove the container", function() {
       this.widget.collector('destroy');
       expect(this.widget.collector('container')).not.toExist();
@@ -182,34 +188,34 @@
       return this.widget.remove();
     });
     it("should add delete links to each menu item", function() {
-      return expect(this.widget.collector('menu').find('li a.collector-remove').length).toEqual(3);
+      return expect(this.widget.collector('menu').find('li a.cllctr-remove').length).toEqual(3);
     });
     it("should provide a remove_text option that specifies remove link content", function() {
-      return expect(this.widget.collector('menu').find('li:first a.collector-remove').text()).toEqual('Get rid of this!');
+      return expect(this.widget.collector('menu').find('li:first a.cllctr-remove').text()).toEqual('Get rid of this!');
     });
     it("should trigger a remove event when a remove link is clicked", function() {
       spyOnEvent(this.widget, 'collectorremove');
-      this.widget.collector('menu').find('li:first a.collector-remove').click();
+      this.widget.collector('menu').find('li:first a.cllctr-remove').click();
       return expect('collectorremove').toHaveBeenTriggeredOn(this.widget);
     });
-    it("should add the collector-removed class to removed items", function() {
+    it("should add the cllctr-removed class to removed items", function() {
       var li;
       li = this.widget.collector('menu').find('li:eq(1)');
-      expect(li).not.toHaveClass('collector-removed');
-      li.find('a.collector-remove').click();
-      return expect(li).toHaveClass('collector-removed');
+      expect(li).not.toHaveClass('cllctr-removed');
+      li.find('a.cllctr-remove').click();
+      return expect(li).toHaveClass('cllctr-removed');
     });
     it("should provide easy value-based interface to manually remove options", function() {
-      expect(this.widget.collector('menu').find('li:last')).not.toHaveClass('collector-removed');
+      expect(this.widget.collector('menu').find('li:last')).not.toHaveClass('cllctr-removed');
       this.widget.collector('remove_option', '3');
-      return expect(this.widget.collector('menu').find('li:last')).toHaveClass('collector-removed');
+      return expect(this.widget.collector('menu').find('li:last')).toHaveClass('cllctr-removed');
     });
     it("should provide easy value-based interface to unremove options", function() {
-      expect(this.widget.collector('menu').find('li:last')).not.toHaveClass('collector-removed');
+      expect(this.widget.collector('menu').find('li:last')).not.toHaveClass('cllctr-removed');
       this.widget.collector('remove_option', '3');
-      expect(this.widget.collector('menu').find('li:last')).toHaveClass('collector-removed');
+      expect(this.widget.collector('menu').find('li:last')).toHaveClass('cllctr-removed');
       this.widget.collector('unremove_option', '3');
-      return expect(this.widget.collector('menu').find('li:last')).not.toHaveClass('collector-removed');
+      return expect(this.widget.collector('menu').find('li:last')).not.toHaveClass('cllctr-removed');
     });
     return it("shouldn't add the remove links by default", function() {
       var widget2;
@@ -218,7 +224,7 @@
         widget2.collector('destroy');
         return widget2.remove();
       });
-      return expect(widget2.collector('menu').find('li a.collector-remove')).not.toExist();
+      return expect(widget2.collector('menu').find('li a.cllctr-remove')).not.toExist();
     });
   });
 
@@ -255,7 +261,7 @@
       return expect(this.widget.collector('searcher')).toExist();
     });
     it("should add the searcher to the container", function() {
-      return expect(this.widget.collector('container')).toContain('input.collector-searcher');
+      return expect(this.widget.collector('container')).toContain('input.cllctr-searcher');
     });
     it("should trigger a search event with the search value when there's typing in the search field", function() {
       var callback_value;
@@ -270,34 +276,34 @@
       this.widget.collector('searcher').keyup();
       return expect(callback_value).toEqual('testSearch');
     });
-    it("should add the collector-filtered class to the widget container when searching for a value", function() {
-      expect(this.widget.collector('container')).not.toHaveClass('collector-filtered');
+    it("should add the cllctr-filtered class to the widget container when searching for a value", function() {
+      expect(this.widget.collector('container')).not.toHaveClass('cllctr-filtered');
       this.widget.collector('searcher').keyup();
-      return expect(this.widget.collector('container')).toHaveClass('collector-filtered');
+      return expect(this.widget.collector('container')).toHaveClass('cllctr-filtered');
     });
     it("should provide a manual search method", function() {
-      expect(this.widget.collector('container')).not.toHaveClass('collector-filtered');
+      expect(this.widget.collector('container')).not.toHaveClass('cllctr-filtered');
       this.widget.collector('search', 'something');
-      return expect(this.widget.collector('container')).toHaveClass('collector-filtered');
+      return expect(this.widget.collector('container')).toHaveClass('cllctr-filtered');
     });
     it("should provide an unfilter method", function() {
       this.widget.collector('search', 'filter_text');
-      expect(this.widget.collector('container')).toHaveClass('collector-filtered');
+      expect(this.widget.collector('container')).toHaveClass('cllctr-filtered');
       this.widget.collector('unfilter');
-      return expect(this.widget.collector('container')).not.toHaveClass('collector-filtered');
+      return expect(this.widget.collector('container')).not.toHaveClass('cllctr-filtered');
     });
-    it("should add a collector-filtered class to menu options who's label that don't match the search value", function() {
-      expect(this.widget.collector('menu').find('li:eq(0)')).not.toHaveClass('collector-filtered');
-      expect(this.widget.collector('menu').find('li:eq(1)')).not.toHaveClass('collector-filtered');
-      expect(this.widget.collector('menu').find('li:eq(2)')).not.toHaveClass('collector-filtered');
-      expect(this.widget.collector('menu').find('li:eq(3)')).not.toHaveClass('collector-filtered');
-      expect(this.widget.collector('menu').find('li:eq(4)')).not.toHaveClass('collector-filtered');
+    it("should add a cllctr-filtered class to menu options who's label that don't match the search value", function() {
+      expect(this.widget.collector('menu').find('li:eq(0)')).not.toHaveClass('cllctr-filtered');
+      expect(this.widget.collector('menu').find('li:eq(1)')).not.toHaveClass('cllctr-filtered');
+      expect(this.widget.collector('menu').find('li:eq(2)')).not.toHaveClass('cllctr-filtered');
+      expect(this.widget.collector('menu').find('li:eq(3)')).not.toHaveClass('cllctr-filtered');
+      expect(this.widget.collector('menu').find('li:eq(4)')).not.toHaveClass('cllctr-filtered');
       this.widget.collector('search', 'th');
-      expect(this.widget.collector('menu').find('li:eq(0)')).toHaveClass('collector-filtered');
-      expect(this.widget.collector('menu').find('li:eq(1)')).toHaveClass('collector-filtered');
-      expect(this.widget.collector('menu').find('li:eq(2)')).not.toHaveClass('collector-filtered');
-      expect(this.widget.collector('menu').find('li:eq(3)')).not.toHaveClass('collector-filtered');
-      return expect(this.widget.collector('menu').find('li:eq(4)')).not.toHaveClass('collector-filtered');
+      expect(this.widget.collector('menu').find('li:eq(0)')).toHaveClass('cllctr-filtered');
+      expect(this.widget.collector('menu').find('li:eq(1)')).toHaveClass('cllctr-filtered');
+      expect(this.widget.collector('menu').find('li:eq(2)')).not.toHaveClass('cllctr-filtered');
+      expect(this.widget.collector('menu').find('li:eq(3)')).not.toHaveClass('cllctr-filtered');
+      return expect(this.widget.collector('menu').find('li:eq(4)')).not.toHaveClass('cllctr-filtered');
     });
     return it("should not render the search field by default", function() {
       var widget2;
