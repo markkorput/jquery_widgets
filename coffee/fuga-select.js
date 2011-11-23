@@ -73,7 +73,12 @@
     };
 
     FugaSelectBase.prototype._availableOptions = function() {
-      return this._availableOptionsCache || (this._availableOptionsCache = this._optionsFromOptions() || this._optionsFromSelect() || []);
+      return this._availableOptionsCache || (this._availableOptionsCache = $.map(this._optionsFromOptions() || this._optionsFromSelect() || [], this._normalizeOption));
+    };
+
+    FugaSelectBase.prototype._normalizeOption = function(option) {
+      option.value = '' + option.value;
+      return option;
     };
 
     FugaSelectBase.prototype._optionsFromOptions = function() {
@@ -126,10 +131,6 @@
       FugaSelectDisplay.__super__.constructor.apply(this, arguments);
     }
 
-    FugaSelectDisplay.prototype.options = $.extend({}, FugaSelectBase.options, {
-      placeholder: ""
-    });
-
     FugaSelectDisplay.prototype._createElements = function() {
       FugaSelectDisplay.__super__._createElements.call(this);
       return this._createDisplay();
@@ -167,10 +168,10 @@
     };
 
     FugaSelectDisplay.prototype._displayText = function() {
-      if (this._selectedOption() && this._selectedOption().label !== '') {
+      if (this._selectedOption() && this._selectedOption().label && this._selectedOption().label !== '') {
         return this._selectedOption().label;
       }
-      return this.options.placeholder;
+      return this.options.placeholder || '';
     };
 
     FugaSelectDisplay.prototype.display = function() {

@@ -47,9 +47,13 @@ class FugaSelectBase
       @element.val(value) if @element.is('select') || @element.is('input') 
       return @_value = value
 
-  _availableOptions: -> @_availableOptionsCache ||= @_optionsFromOptions() || @_optionsFromSelect() || []
+  _availableOptions: -> @_availableOptionsCache ||= $.map(@_optionsFromOptions() || @_optionsFromSelect() || [], @_normalizeOption)
 
-  # todo let this method parse the options and make sure we've got useable objects
+  # todo; this should do more; like create value attribute, when there's only a label attribute, or turn strings into value/label objects
+  _normalizeOption: (option) ->
+    option.value = (''+option.value)
+    return option
+
   _optionsFromOptions: -> @options.options
 
   _optionsFromSelect: ->
@@ -80,8 +84,6 @@ class FugaSelectBase
 
 
 class FugaSelectDisplay extends FugaSelectBase
-  
-  options: $.extend({}, FugaSelectBase.options, {placeholder: ""})
 
   _createElements: ->
     super()
@@ -105,6 +107,7 @@ class FugaSelectDisplay extends FugaSelectBase
     self = this
     result = {}
     $.each @_availableOptions(), (index, option) ->
+      # convert option value attributes to strings
       result = option if option.value == self._getValue()
     return result
 
@@ -113,8 +116,8 @@ class FugaSelectDisplay extends FugaSelectBase
     @display().text @_displayText()
 
   _displayText: ->
-    return @_selectedOption().label if @_selectedOption() && @_selectedOption().label != ''
-    return @options.placeholder
+    return @_selectedOption().label if @_selectedOption() && @_selectedOption().label  && @_selectedOption().label != ''
+    return @options.placeholder || ''
 
   display: ->
     @display_el
