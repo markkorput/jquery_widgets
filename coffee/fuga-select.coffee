@@ -174,7 +174,9 @@ class FugaSelectToggler extends FugaSelectDisplay
 class FugaSelect extends FugaSelectToggler
   options: $.extend({}, FugaSelectToggler.options, {allow_remove: false, remove_text: "remove"})
 
-  _generateMenuOption: (option) -> super(option).append($('<a></a>').attr('href', '#').addClass('collector-remove').text(@options.remove_text))
+  _generateMenuOption: (option) ->
+    return super(option) if @options.allow_remove != true
+    return super(option).append($('<a></a>').attr('href', '#').addClass('collector-remove').text(@options.remove_text))
 
   _handleMenuClick: (event) ->
     if $(event.target).is('a.collector-remove')
@@ -186,6 +188,7 @@ class FugaSelect extends FugaSelectToggler
 
   remove_option: (value) -> @menu().find('li[value='+value+']').addClass('collector-removed')
   unremove_option: (value) -> @menu().find('li[value='+value+']').removeClass('collector-removed')
+
 
 # register jquery widget from CautiousWidget class
 $.widget 'fuga.collector', new FugaSelect

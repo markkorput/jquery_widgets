@@ -147,7 +147,7 @@ describe "Collector (Removing)", ->
   beforeEach ->
     @html = '<select><option value="1">first</option><option value="2">second</option><option value="3">third</option></select>'
     @widget = $(@html).appendTo($('body')).collector
-      allow_delete: true
+      allow_remove: true
       remove_text: 'Get rid of this!'
 
   afterEach ->
@@ -183,5 +183,12 @@ describe "Collector (Removing)", ->
     @widget.collector 'unremove_option', '3'
     expect(@widget.collector('menu').find('li:last')).not.toHaveClass 'collector-removed'
 
+  it "shouldn't add the remove links by default", ->
+    html2 = '<select><option value="1">first</option><option value="2">second</option><option value="3">third</option></select>'
+    widget2 = $(html2).appendTo($('body')).collector()
 
+    @after ->
+      widget2.collector('destroy')
+      widget2.remove()
 
+    expect(widget2.collector('menu').find('li a.collector-remove')).not.toExist()

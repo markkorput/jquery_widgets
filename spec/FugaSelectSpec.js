@@ -167,7 +167,7 @@
     beforeEach(function() {
       this.html = '<select><option value="1">first</option><option value="2">second</option><option value="3">third</option></select>';
       return this.widget = $(this.html).appendTo($('body')).collector({
-        allow_delete: true,
+        allow_remove: true,
         remove_text: 'Get rid of this!'
       });
     });
@@ -198,12 +198,22 @@
       this.widget.collector('remove_option', '3');
       return expect(this.widget.collector('menu').find('li:last')).toHaveClass('collector-removed');
     });
-    return it("should provide easy value-based interface to unremove options", function() {
+    it("should provide easy value-based interface to unremove options", function() {
       expect(this.widget.collector('menu').find('li:last')).not.toHaveClass('collector-removed');
       this.widget.collector('remove_option', '3');
       expect(this.widget.collector('menu').find('li:last')).toHaveClass('collector-removed');
       this.widget.collector('unremove_option', '3');
       return expect(this.widget.collector('menu').find('li:last')).not.toHaveClass('collector-removed');
+    });
+    return it("shouldn't add the remove links by default", function() {
+      var html2, widget2;
+      html2 = '<select><option value="1">first</option><option value="2">second</option><option value="3">third</option></select>';
+      widget2 = $(html2).appendTo($('body')).collector();
+      this.after(function() {
+        widget2.collector('destroy');
+        return widget2.remove();
+      });
+      return expect(widget2.collector('menu').find('li a.collector-remove')).not.toExist();
     });
   });
 

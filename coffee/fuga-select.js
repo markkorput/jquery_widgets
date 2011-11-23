@@ -264,6 +264,9 @@
     });
 
     FugaSelect.prototype._generateMenuOption = function(option) {
+      if (this.options.allow_remove !== true) {
+        return FugaSelect.__super__._generateMenuOption.call(this, option);
+      }
       return FugaSelect.__super__._generateMenuOption.call(this, option).append($('<a></a>').attr('href', '#').addClass('collector-remove').text(this.options.remove_text));
     };
 
