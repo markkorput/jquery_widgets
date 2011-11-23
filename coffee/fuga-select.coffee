@@ -47,7 +47,7 @@ class FugaSelectBase
       @element.val(value) if @element.is('select') || @element.is('input') 
       return @_value = value
 
-  _availableOptions: -> @_availableOptionsCache ||= $.map(@_optionsFromOptions() || @_optionsFromSelect() || [], @_normalizeOption)
+  _options: -> @_options_chache ||= $.map(@_optionsFromOptions() || @_optionsFromSelect() || [], @_normalizeOption)
 
   # todo; this should do more; like create value attribute, when there's only a label attribute, or turn strings into value/label objects
   _normalizeOption: (option) ->
@@ -63,7 +63,7 @@ class FugaSelectBase
       label: $(option).text()
 
   _generateMenu: (options) ->
-    options ||= @_availableOptions()
+    options ||= @_options()
     menu = $('<ul></ul>').addClass('collector-options')
     self = this
     $.each options, (index, option) -> self._generateMenuOption(option).appendTo(menu)
@@ -106,7 +106,7 @@ class FugaSelectDisplay extends FugaSelectBase
   _selectedOption: ->
     self = this
     result = {}
-    $.each @_availableOptions(), (index, option) ->
+    $.each @_options(), (index, option) ->
       # convert option value attributes to strings
       result = option if option.value == self._getValue()
     return result
@@ -186,7 +186,7 @@ class FugaSelectToggler extends FugaSelectDisplay
       @container().removeClass('collector-open').addClass('collector-closed')
 
 
-class FugaSelect extends FugaSelectToggler
+class FugaSelectRemover extends FugaSelectToggler
   options: $.extend({}, FugaSelectToggler.options, {allow_remove: false, remove_text: "remove"})
 
   _generateMenuOption: (option) ->
@@ -203,6 +203,74 @@ class FugaSelect extends FugaSelectToggler
 
   remove_option: (value) -> @menu().find('li[value='+value+']').addClass('collector-removed')
   unremove_option: (value) -> @menu().find('li[value='+value+']').removeClass('collector-removed')
+
+
+
+
+
+class FugaSelect extends FugaSelectRemover
+  _createElements: ->
+    super()
+    # search must be explicitly enabled
+    if @options.allow_search == true
+      searcher = $('<input>').attr('type', 'text').addClass('collector-searcher') 
+      if @menu # add right before options menu if there's an options menu
+        @menu().before searcher
+      else # otherwise simply add to the end of the widget's container
+        @container().append searcher
+
+  _removeElements: ->
+    @searcher().remove() if @searcher()
+    super()
+
+  _setupBindings: ->
+    super()
+    @searcher().bind('keyup', $.proxy(@_handleSearcherTyping, this)) if @searcher()
+
+  _removeBindings: ->
+    @searcher().unbind('keyup') if @searcher()
+    super()
+
+  searcher: ->
+    @container().find('input.collector-searcher') if @container()
+
+  _handleSearcherTyping: (event) ->
+    @search(@searcher().val()) if @_trigger 'search', event, @searcher().val()
+
+  search: (value) ->
+    # also put the value in the searcher field, in case this was an external call
+    @searcher().val(value) if @searcher()
+
+    # set the filtered attribute for each option (in-memory)
+    @_determineFilteredStates(value)
+    # set menu option classes according to the inmemory options' filtered states
+    @_distributeFilteredStates()
+
+    # TODO go through all available options, set unmatching options to filtered and update menu item classes
+    @container().addClass 'collector-filtered'
+
+  _determineFilteredStates: (value) ->
+    # apply filtered status to internal (in-memory) option-objects
+    for option in @_options()
+      if @_matchOption(option, value)
+        # explicitly set to false, overwriting any previous state
+        option.filtered = false
+      else
+        option.filtered = true 
+    
+  _distributeFilteredStates: ->
+    # apply filtered status to internal (in-memory) option-objects
+    for option in @_options()
+      if option.filtered == true
+        @menu().find('li[value='+option.value+']').addClass('collector-filtered')
+      else
+        @menu().find('li[value='+option.value+']').removeClass('collector-filtered')
+
+  _matchOption: (option, value) -> option.label.indexOf(''+value) != -1
+
+  unfilter: ->
+    # TODO; remove filter classes form the individual items?
+    @container().removeClass 'collector-filtered'
 
 
 # register jquery widget from CautiousWidget class

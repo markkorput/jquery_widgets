@@ -1,5 +1,5 @@
 (function() {
-  var $, FugaSelect, FugaSelectBase, FugaSelectDisplay, FugaSelectToggler, root;
+  var $, FugaSelect, FugaSelectBase, FugaSelectDisplay, FugaSelectRemover, FugaSelectToggler, root;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
   root = this;
@@ -72,8 +72,8 @@
       }
     };
 
-    FugaSelectBase.prototype._availableOptions = function() {
-      return this._availableOptionsCache || (this._availableOptionsCache = $.map(this._optionsFromOptions() || this._optionsFromSelect() || [], this._normalizeOption));
+    FugaSelectBase.prototype._options = function() {
+      return this._options_chache || (this._options_chache = $.map(this._optionsFromOptions() || this._optionsFromSelect() || [], this._normalizeOption));
     };
 
     FugaSelectBase.prototype._normalizeOption = function(option) {
@@ -97,7 +97,7 @@
 
     FugaSelectBase.prototype._generateMenu = function(options) {
       var menu, self;
-      options || (options = this._availableOptions());
+      options || (options = this._options());
       menu = $('<ul></ul>').addClass('collector-options');
       self = this;
       $.each(options, function(index, option) {
@@ -156,7 +156,7 @@
       var result, self;
       self = this;
       result = {};
-      $.each(this._availableOptions(), function(index, option) {
+      $.each(this._options(), function(index, option) {
         if (option.value === self._getValue()) return result = option;
       });
       return result;
@@ -266,27 +266,27 @@
 
   })();
 
-  FugaSelect = (function() {
+  FugaSelectRemover = (function() {
 
-    __extends(FugaSelect, FugaSelectToggler);
+    __extends(FugaSelectRemover, FugaSelectToggler);
 
-    function FugaSelect() {
-      FugaSelect.__super__.constructor.apply(this, arguments);
+    function FugaSelectRemover() {
+      FugaSelectRemover.__super__.constructor.apply(this, arguments);
     }
 
-    FugaSelect.prototype.options = $.extend({}, FugaSelectToggler.options, {
+    FugaSelectRemover.prototype.options = $.extend({}, FugaSelectToggler.options, {
       allow_remove: false,
       remove_text: "remove"
     });
 
-    FugaSelect.prototype._generateMenuOption = function(option) {
+    FugaSelectRemover.prototype._generateMenuOption = function(option) {
       if (this.options.allow_remove !== true) {
-        return FugaSelect.__super__._generateMenuOption.call(this, option);
+        return FugaSelectRemover.__super__._generateMenuOption.call(this, option);
       }
-      return FugaSelect.__super__._generateMenuOption.call(this, option).append($('<a></a>').attr('href', '#').addClass('collector-remove').text(this.options.remove_text));
+      return FugaSelectRemover.__super__._generateMenuOption.call(this, option).append($('<a></a>').attr('href', '#').addClass('collector-remove').text(this.options.remove_text));
     };
 
-    FugaSelect.prototype._handleMenuClick = function(event) {
+    FugaSelectRemover.prototype._handleMenuClick = function(event) {
       var value;
       if ($(event.target).is('a.collector-remove')) {
         event.preventDefault();
@@ -295,16 +295,115 @@
           return this.remove_option(value);
         }
       } else {
-        return FugaSelect.__super__._handleMenuClick.call(this, event);
+        return FugaSelectRemover.__super__._handleMenuClick.call(this, event);
       }
     };
 
-    FugaSelect.prototype.remove_option = function(value) {
+    FugaSelectRemover.prototype.remove_option = function(value) {
       return this.menu().find('li[value=' + value + ']').addClass('collector-removed');
     };
 
-    FugaSelect.prototype.unremove_option = function(value) {
+    FugaSelectRemover.prototype.unremove_option = function(value) {
       return this.menu().find('li[value=' + value + ']').removeClass('collector-removed');
+    };
+
+    return FugaSelectRemover;
+
+  })();
+
+  FugaSelect = (function() {
+
+    __extends(FugaSelect, FugaSelectRemover);
+
+    function FugaSelect() {
+      FugaSelect.__super__.constructor.apply(this, arguments);
+    }
+
+    FugaSelect.prototype._createElements = function() {
+      var searcher;
+      FugaSelect.__super__._createElements.call(this);
+      if (this.options.allow_search === true) {
+        searcher = $('<input>').attr('type', 'text').addClass('collector-searcher');
+        if (this.menu) {
+          return this.menu().before(searcher);
+        } else {
+          return this.container().append(searcher);
+        }
+      }
+    };
+
+    FugaSelect.prototype._removeElements = function() {
+      if (this.searcher()) this.searcher().remove();
+      return FugaSelect.__super__._removeElements.call(this);
+    };
+
+    FugaSelect.prototype._setupBindings = function() {
+      FugaSelect.__super__._setupBindings.call(this);
+      if (this.searcher()) {
+        return this.searcher().bind('keyup', $.proxy(this._handleSearcherTyping, this));
+      }
+    };
+
+    FugaSelect.prototype._removeBindings = function() {
+      if (this.searcher()) this.searcher().unbind('keyup');
+      return FugaSelect.__super__._removeBindings.call(this);
+    };
+
+    FugaSelect.prototype.searcher = function() {
+      if (this.container()) {
+        return this.container().find('input.collector-searcher');
+      }
+    };
+
+    FugaSelect.prototype._handleSearcherTyping = function(event) {
+      if (this._trigger('search', event, this.searcher().val())) {
+        return this.search(this.searcher().val());
+      }
+    };
+
+    FugaSelect.prototype.search = function(value) {
+      if (this.searcher()) this.searcher().val(value);
+      this._determineFilteredStates(value);
+      this._distributeFilteredStates();
+      return this.container().addClass('collector-filtered');
+    };
+
+    FugaSelect.prototype._determineFilteredStates = function(value) {
+      var option, _i, _len, _ref, _results;
+      _ref = this._options();
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        option = _ref[_i];
+        if (this._matchOption(option, value)) {
+          _results.push(option.filtered = false);
+        } else {
+          _results.push(option.filtered = true);
+        }
+      }
+      return _results;
+    };
+
+    FugaSelect.prototype._distributeFilteredStates = function() {
+      var option, _i, _len, _ref, _results;
+      _ref = this._options();
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        option = _ref[_i];
+        if (option.filtered === true) {
+          _results.push(this.menu().find('li[value=' + option.value + ']').addClass('collector-filtered'));
+        } else {
+          _results.push(this.menu().find('li[value=' + option.value + ']').removeClass('collector-filtered'));
+        }
+      }
+      return _results;
+    };
+
+    FugaSelect.prototype._matchOption = function(option, value) {
+      return option.label.indexOf('' + value) !== -1;
+    };
+
+    FugaSelect.prototype.unfilter = function() {
+      return this.container().removeClass('collector-filtered');
     };
 
     return FugaSelect;

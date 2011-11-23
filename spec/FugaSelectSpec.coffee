@@ -52,9 +52,7 @@ describe "Collector (Base)", ->
 
   it "should provide an option to specify the available choices", ->
     widget = $('<div />').appendTo($('body')).collector {options: [{value: 1, label: 'no 1'}, {value: 2, label: 'no 2'}, {value: 3, label: 'no 3'}]}
-    @after ->
-      widget.collector('destroy')
-      widget.remove()
+    @after -> widget.collector('destroy'); widget.remove()
     expect($.map(widget.collector('menu').find('li a:first-child'), (a) -> $(a).text())).toEqual ['no 1', 'no 2', 'no 3']
 
 
@@ -196,13 +194,8 @@ describe "Collector (Removing)", ->
     expect(@widget.collector('menu').find('li:last')).not.toHaveClass 'collector-removed'
 
   it "shouldn't add the remove links by default", ->
-    html2 = '<select><option value="1">first</option><option value="2">second</option><option value="3">third</option></select>'
-    widget2 = $(html2).appendTo($('body')).collector()
-
-    @after ->
-      widget2.collector('destroy')
-      widget2.remove()
-
+    widget2 = $('<select><option value="1">first</option><option value="2">second</option><option value="3">third</option></select>').appendTo($('body')).collector()
+    @after -> widget2.collector('destroy'); widget2.remove()
     expect(widget2.collector('menu').find('li a.collector-remove')).not.toExist()
 
 
@@ -210,24 +203,22 @@ describe "Collector (Removing)", ->
 describe "Collector (Searching)", ->
 
   beforeEach ->
-    # @html = '<select><option value="1">first</option><option value="2">second</option><option value="3">third</option></select>'
-    # @widget = $(@html).appendTo($('body')).collector()
     @choices = [{value: 1, label: 'first'}, {value: 2, label: 'second'}, {value: 3, label: 'third'}, {value: 4, label: 'fourth'}, {value: 5, label: 'fifth'}]
-    @widget = $('<div id="dummy">&nbsp;</div>').appendTo($('body')).collector({options: @choices})
-    #   options: @choices
-    #   allow_search: true
+    @widget = $('<div id="dummy">&nbsp;</div>').appendTo($('body')).collector
+      options: @choices,
+      allow_search: true
 
   afterEach ->
-    # @widget.collector('destroy')
-    # @widget.remove()
+    @widget.collector('destroy')
+    @widget.remove()
 
   it "should add a search field to the widget", ->
     expect(@widget.collector('searcher')).toExist()
 
   it "should add the searcher to the container", ->
-    expect(@widget.collector('container')).toContain 'input.collector-search'
+    expect(@widget.collector('container')).toContain 'input.collector-searcher'
 
-  it "should trigger a search event with the search value when the content of the search changes", ->
+  it "should trigger a search event with the search value when there's typing in the search field", ->
     # this should receive the right value
     callback_value = null
     # setup binding
@@ -236,13 +227,13 @@ describe "Collector (Searching)", ->
     @after -> @widget.unbind 'collectorsearch'
     # simulate user search
     @widget.collector('searcher').val 'testSearch'
-    @widget.collector('searcher').change()
+    @widget.collector('searcher').keyup()
     # check if our custom callback was triggered with the right value
     expect(callback_value).toEqual 'testSearch'
 
   it "should add the collector-filtered class to the widget container when searching for a value", ->
     expect(@widget.collector('container')).not.toHaveClass 'collector-filtered'
-    @widget.collector('searcher').change()
+    @widget.collector('searcher').keyup()
     expect(@widget.collector('container')).toHaveClass 'collector-filtered'
 
   it "should provide a manual search method", ->
@@ -271,4 +262,5 @@ describe "Collector (Searching)", ->
 
   it "should not render the search field by default", ->
     widget2 = $('<div id="dummy">&nbsp</div>').appendTo($('body')).collector {options: [{value: 1, label: 'one'}, {value: 2, label: 'two'}]}
+    @after -> widget2.collector('destroy'); widget2.remove();
     expect(widget2.collector('searcher')).not.toExist()

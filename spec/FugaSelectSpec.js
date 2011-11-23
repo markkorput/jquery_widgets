@@ -212,9 +212,8 @@
       return expect(this.widget.collector('menu').find('li:last')).not.toHaveClass('collector-removed');
     });
     return it("shouldn't add the remove links by default", function() {
-      var html2, widget2;
-      html2 = '<select><option value="1">first</option><option value="2">second</option><option value="3">third</option></select>';
-      widget2 = $(html2).appendTo($('body')).collector();
+      var widget2;
+      widget2 = $('<select><option value="1">first</option><option value="2">second</option><option value="3">third</option></select>').appendTo($('body')).collector();
       this.after(function() {
         widget2.collector('destroy');
         return widget2.remove();
@@ -244,17 +243,21 @@
         }
       ];
       return this.widget = $('<div id="dummy">&nbsp;</div>').appendTo($('body')).collector({
-        options: this.choices
+        options: this.choices,
+        allow_search: true
       });
     });
-    afterEach(function() {});
+    afterEach(function() {
+      this.widget.collector('destroy');
+      return this.widget.remove();
+    });
     it("should add a search field to the widget", function() {
       return expect(this.widget.collector('searcher')).toExist();
     });
     it("should add the searcher to the container", function() {
-      return expect(this.widget.collector('container')).toContain('input.collector-search');
+      return expect(this.widget.collector('container')).toContain('input.collector-searcher');
     });
-    it("should trigger a search event with the search value when the content of the search changes", function() {
+    it("should trigger a search event with the search value when there's typing in the search field", function() {
       var callback_value;
       callback_value = null;
       this.widget.bind('collectorsearch', function(event, value) {
@@ -264,12 +267,12 @@
         return this.widget.unbind('collectorsearch');
       });
       this.widget.collector('searcher').val('testSearch');
-      this.widget.collector('searcher').change();
+      this.widget.collector('searcher').keyup();
       return expect(callback_value).toEqual('testSearch');
     });
     it("should add the collector-filtered class to the widget container when searching for a value", function() {
       expect(this.widget.collector('container')).not.toHaveClass('collector-filtered');
-      this.widget.collector('searcher').change();
+      this.widget.collector('searcher').keyup();
       return expect(this.widget.collector('container')).toHaveClass('collector-filtered');
     });
     it("should provide a manual search method", function() {
@@ -308,6 +311,10 @@
             label: 'two'
           }
         ]
+      });
+      this.after(function() {
+        widget2.collector('destroy');
+        return widget2.remove();
       });
       return expect(widget2.collector('searcher')).not.toExist();
     });

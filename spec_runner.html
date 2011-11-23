@@ -37,8 +37,19 @@
 <body>
 
 
+<select id="manual_tester">
+  <option value="1">first</option>
+  <option value="2">second</option>
+  <option value="3">third</option>
+  <option value="4">4th</option>
+  <option value="5">5th</option>
+  <option value="6">6th</option>
+</select>
+
+
 
 <script type="text/javascript">
+  jQuery('select#manual_tester').collector();
 
   jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
 
