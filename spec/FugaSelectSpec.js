@@ -24,11 +24,9 @@
       this.widget.collector('menu').find('li:eq(1) a:first').click();
       return expect(this.widget.collector('value')).toEqual('2');
     });
-    it("should allow changing value through the value setter, but only available values are allowed", function() {
-      this.widget.collector('value', '1');
-      expect(this.widget.collector('value')).toEqual('1');
-      this.widget.collector('value', '1');
-      return expect(this.widget.collector('value')).toEqual('1');
+    it("should distribute new value to the original element", function() {
+      this.widget.collector('value', 2);
+      return expect(this.widget.val()).toEqual('2');
     });
     it("should trigger change event when value changes through value setter", function() {
       spyOnEvent(this.widget, 'collectorchange');
@@ -222,6 +220,96 @@
         return widget2.remove();
       });
       return expect(widget2.collector('menu').find('li a.collector-remove')).not.toExist();
+    });
+  });
+
+  describe("Collector (Searching)", function() {
+    beforeEach(function() {
+      this.choices = [
+        {
+          value: 1,
+          label: 'first'
+        }, {
+          value: 2,
+          label: 'second'
+        }, {
+          value: 3,
+          label: 'third'
+        }, {
+          value: 4,
+          label: 'fourth'
+        }, {
+          value: 5,
+          label: 'fifth'
+        }
+      ];
+      return this.widget = $('<div id="dummy">&nbsp;</div>').appendTo($('body')).collector({
+        options: this.choices
+      });
+    });
+    afterEach(function() {});
+    it("should add a search field to the widget", function() {
+      return expect(this.widget.collector('searcher')).toExist();
+    });
+    it("should add the searcher to the container", function() {
+      return expect(this.widget.collector('container')).toContain('input.collector-search');
+    });
+    it("should trigger a search event with the search value when the content of the search changes", function() {
+      var callback_value;
+      callback_value = null;
+      this.widget.bind('collectorsearch', function(event, value) {
+        return callback_value = value;
+      });
+      this.after(function() {
+        return this.widget.unbind('collectorsearch');
+      });
+      this.widget.collector('searcher').val('testSearch');
+      this.widget.collector('searcher').change();
+      return expect(callback_value).toEqual('testSearch');
+    });
+    it("should add the collector-filtered class to the widget container when searching for a value", function() {
+      expect(this.widget.collector('container')).not.toHaveClass('collector-filtered');
+      this.widget.collector('searcher').change();
+      return expect(this.widget.collector('container')).toHaveClass('collector-filtered');
+    });
+    it("should provide a manual search method", function() {
+      expect(this.widget.collector('container')).not.toHaveClass('collector-filtered');
+      this.widget.collector('search', 'something');
+      return expect(this.widget.collector('container')).toHaveClass('collector-filtered');
+    });
+    it("should provide an unfilter method", function() {
+      this.widget.collector('search', 'filter_text');
+      expect(this.widget.collector('container')).toHaveClass('collector-filtered');
+      this.widget.collector('unfilter');
+      return expect(this.widget.collector('container')).not.toHaveClass('collector-filtered');
+    });
+    it("should add a collector-filtered class to menu options who's label that don't match the search value", function() {
+      expect(this.widget.collector('menu').find('li:eq(0)')).not.toHaveClass('collector-filtered');
+      expect(this.widget.collector('menu').find('li:eq(1)')).not.toHaveClass('collector-filtered');
+      expect(this.widget.collector('menu').find('li:eq(2)')).not.toHaveClass('collector-filtered');
+      expect(this.widget.collector('menu').find('li:eq(3)')).not.toHaveClass('collector-filtered');
+      expect(this.widget.collector('menu').find('li:eq(4)')).not.toHaveClass('collector-filtered');
+      this.widget.collector('search', 'th');
+      expect(this.widget.collector('menu').find('li:eq(0)')).toHaveClass('collector-filtered');
+      expect(this.widget.collector('menu').find('li:eq(1)')).toHaveClass('collector-filtered');
+      expect(this.widget.collector('menu').find('li:eq(2)')).not.toHaveClass('collector-filtered');
+      expect(this.widget.collector('menu').find('li:eq(3)')).not.toHaveClass('collector-filtered');
+      return expect(this.widget.collector('menu').find('li:eq(4)')).not.toHaveClass('collector-filtered');
+    });
+    return it("should not render the search field by default", function() {
+      var widget2;
+      widget2 = $('<div id="dummy">&nbsp</div>').appendTo($('body')).collector({
+        options: [
+          {
+            value: 1,
+            label: 'one'
+          }, {
+            value: 2,
+            label: 'two'
+          }
+        ]
+      });
+      return expect(widget2.collector('searcher')).not.toExist();
     });
   });
 

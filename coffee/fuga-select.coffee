@@ -38,9 +38,14 @@ class FugaSelectBase
       if @_trigger 'select', event, value
         @_setValue value
 
-  _getValue: -> @element.val()
+  _getValue: ->
+    return ''+@_value if @_value
+    return ''+@_value = @element.val() if @element.is('select') || @element.is('input') 
 
-  _setValue: (value) -> @element.val(value) if @_trigger 'change', value
+  _setValue: (value) ->
+    if @_trigger 'change', value
+      @element.val(value) if @element.is('select') || @element.is('input') 
+      return @_value = value
 
   _availableOptions: -> @_availableOptionsCache ||= @_optionsFromOptions() || @_optionsFromSelect() || []
 

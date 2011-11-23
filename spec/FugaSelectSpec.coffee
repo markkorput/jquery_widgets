@@ -21,26 +21,30 @@ describe "Collector (Base)", ->
     @widget.collector('menu').find('li:eq(1) a:first').click()
     expect(@widget.collector('value')).toEqual '2'
 
-  it "should allow changing value through the value setter, but only available values are allowed", ->
-    @widget.collector('value', '1')
-    expect(@widget.collector('value')).toEqual '1'
-    # options "third" doesn't exist
-    @widget.collector('value', '1')
-    expect(@widget.collector('value')).toEqual '1'
-  
+  # it "should allow changing value through the value setter, but only available values are allowed", ->
+  #   @widget.collector('value', '1')
+  #   expect(@widget.collector('value')).toEqual '1'
+  #   # options "third" doesn't exist
+  #   @widget.collector('value', '3')
+  #   expect(@widget.collector('value')).toEqual '1'
+
+  it "should distribute new value to the original element", ->
+    @widget.collector 'value', 2
+    expect(@widget.val()).toEqual '2'
+
   it "should trigger change event when value changes through value setter", ->
     spyOnEvent(@widget, 'collectorchange')
     @widget.collector('value', 'second')
     expect('collectorchange').toHaveBeenTriggeredOn(@widget)
-  
+
   it "should trigger change event when an options is clicked changes through value setter", ->
     spyOnEvent(@widget, 'collectorchange')
     @widget.collector('menu').find('li a:first-child')[1].click()
     expect('collectorchange').toHaveBeenTriggeredOn(@widget)
-  
+
   it "should hide the original dom-element", ->
     expect(@widget).not.toBeVisible()
-  
+
   it "should remove the option list on cleanup", ->
     @widget.collector('destroy')
     expect(@widget.collector('menu')).not.toExist()
@@ -200,3 +204,71 @@ describe "Collector (Removing)", ->
       widget2.remove()
 
     expect(widget2.collector('menu').find('li a.collector-remove')).not.toExist()
+
+
+
+describe "Collector (Searching)", ->
+
+  beforeEach ->
+    # @html = '<select><option value="1">first</option><option value="2">second</option><option value="3">third</option></select>'
+    # @widget = $(@html).appendTo($('body')).collector()
+    @choices = [{value: 1, label: 'first'}, {value: 2, label: 'second'}, {value: 3, label: 'third'}, {value: 4, label: 'fourth'}, {value: 5, label: 'fifth'}]
+    @widget = $('<div id="dummy">&nbsp;</div>').appendTo($('body')).collector({options: @choices})
+    #   options: @choices
+    #   allow_search: true
+
+  afterEach ->
+    # @widget.collector('destroy')
+    # @widget.remove()
+
+  it "should add a search field to the widget", ->
+    expect(@widget.collector('searcher')).toExist()
+
+  it "should add the searcher to the container", ->
+    expect(@widget.collector('container')).toContain 'input.collector-search'
+
+  it "should trigger a search event with the search value when the content of the search changes", ->
+    # this should receive the right value
+    callback_value = null
+    # setup binding
+    @widget.bind 'collectorsearch', (event, value) -> callback_value = value
+    # cleanup when test is done
+    @after -> @widget.unbind 'collectorsearch'
+    # simulate user search
+    @widget.collector('searcher').val 'testSearch'
+    @widget.collector('searcher').change()
+    # check if our custom callback was triggered with the right value
+    expect(callback_value).toEqual 'testSearch'
+
+  it "should add the collector-filtered class to the widget container when searching for a value", ->
+    expect(@widget.collector('container')).not.toHaveClass 'collector-filtered'
+    @widget.collector('searcher').change()
+    expect(@widget.collector('container')).toHaveClass 'collector-filtered'
+
+  it "should provide a manual search method", ->
+    expect(@widget.collector('container')).not.toHaveClass 'collector-filtered'
+    @widget.collector('search', 'something')
+    expect(@widget.collector('container')).toHaveClass 'collector-filtered'
+
+  it "should provide an unfilter method", ->
+    @widget.collector 'search', 'filter_text'
+    expect(@widget.collector('container')).toHaveClass 'collector-filtered'
+    @widget.collector 'unfilter'
+    expect(@widget.collector('container')).not.toHaveClass 'collector-filtered'
+
+  it "should add a collector-filtered class to menu options who's label that don't match the search value", ->
+    expect(@widget.collector('menu').find('li:eq(0)')).not.toHaveClass 'collector-filtered'
+    expect(@widget.collector('menu').find('li:eq(1)')).not.toHaveClass 'collector-filtered'
+    expect(@widget.collector('menu').find('li:eq(2)')).not.toHaveClass 'collector-filtered'
+    expect(@widget.collector('menu').find('li:eq(3)')).not.toHaveClass 'collector-filtered'
+    expect(@widget.collector('menu').find('li:eq(4)')).not.toHaveClass 'collector-filtered'
+    @widget.collector 'search', 'th'
+    expect(@widget.collector('menu').find('li:eq(0)')).toHaveClass 'collector-filtered'
+    expect(@widget.collector('menu').find('li:eq(1)')).toHaveClass 'collector-filtered'
+    expect(@widget.collector('menu').find('li:eq(2)')).not.toHaveClass 'collector-filtered'
+    expect(@widget.collector('menu').find('li:eq(3)')).not.toHaveClass 'collector-filtered'
+    expect(@widget.collector('menu').find('li:eq(4)')).not.toHaveClass 'collector-filtered'
+
+  it "should not render the search field by default", ->
+    widget2 = $('<div id="dummy">&nbsp</div>').appendTo($('body')).collector {options: [{value: 1, label: 'one'}, {value: 2, label: 'two'}]}
+    expect(widget2.collector('searcher')).not.toExist()

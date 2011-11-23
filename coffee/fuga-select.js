@@ -57,11 +57,19 @@
     };
 
     FugaSelectBase.prototype._getValue = function() {
-      return this.element.val();
+      if (this._value) return '' + this._value;
+      if (this.element.is('select') || this.element.is('input')) {
+        return '' + (this._value = this.element.val());
+      }
     };
 
     FugaSelectBase.prototype._setValue = function(value) {
-      if (this._trigger('change', value)) return this.element.val(value);
+      if (this._trigger('change', value)) {
+        if (this.element.is('select') || this.element.is('input')) {
+          this.element.val(value);
+        }
+        return this._value = value;
+      }
     };
 
     FugaSelectBase.prototype._availableOptions = function() {
