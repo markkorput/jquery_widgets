@@ -294,8 +294,11 @@ describe "Collector (Creator)", ->
     expect(@widget.collector('creator')).toHaveClass('cllctr-creator')
 
   it "should add the cllctr-perfect-match class to the container when a search value has a perfect match", ->
+    expect(@widget.collector('container')).not.toHaveClass('cllctr-perfect-match')
+    @widget.collector('search', 'secon')
+    expect(@widget.collector('container')).not.toHaveClass('cllctr-perfect-match')
     @widget.collector('search', 'second')
-    expect(@widget.collector('container')).toHaveClasse('cllctr-perfect-match')
+    expect(@widget.collector('container')).toHaveClass('cllctr-perfect-match')
 
   it "should add a new option when the creator option is clicked", ->
     @widget.collector('search', '6th')

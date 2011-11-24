@@ -332,8 +332,11 @@
       return expect(this.widget.collector('creator')).toHaveClass('cllctr-creator');
     });
     it("should add the cllctr-perfect-match class to the container when a search value has a perfect match", function() {
+      expect(this.widget.collector('container')).not.toHaveClass('cllctr-perfect-match');
+      this.widget.collector('search', 'secon');
+      expect(this.widget.collector('container')).not.toHaveClass('cllctr-perfect-match');
       this.widget.collector('search', 'second');
-      return expect(this.widget.collector('container')).toHaveClasse('cllctr-perfect-match');
+      return expect(this.widget.collector('container')).toHaveClass('cllctr-perfect-match');
     });
     it("should add a new option when the creator option is clicked", function() {
       this.widget.collector('search', '6th');

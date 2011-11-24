@@ -456,6 +456,23 @@
       return this.drawer().find('a.cllctr-creator');
     };
 
+    FugaSelect.prototype._perfectMatchOption = function(value) {
+      var option, _i, _len, _ref;
+      _ref = this._options();
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        option = _ref[_i];
+        if (option.value.toLowerCase() === value.toLowerCase()) return option;
+      }
+      return null;
+    };
+
+    FugaSelect.prototype.search = function(value) {
+      FugaSelect.__super__.search.call(this, value);
+      if (this._perfectMatchOption(value) !== null) {
+        return this.container().addClass('cllctr-perfect-match');
+      }
+    };
+
     return FugaSelect;
 
   })();

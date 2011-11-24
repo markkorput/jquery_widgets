@@ -302,6 +302,15 @@ class FugaSelect extends FugaSelectSearcher
 
   creator: -> @drawer().find('a.cllctr-creator')
 
+  _perfectMatchOption: (value) ->
+    for option in @_options()
+      if option.value.toLowerCase() == value.toLowerCase()
+        return option
+    return null
+
+  search: (value) ->
+    super(value)
+    @container().addClass('cllctr-perfect-match') if @_perfectMatchOption(value) != null
 
 
 
