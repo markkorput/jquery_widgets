@@ -49,12 +49,14 @@
     };
 
     FugaSelectBase.prototype._handleMenuClick = function(event) {
+      if ($(event.target).is('li')) return this._handleOptionClick(event);
+    };
+
+    FugaSelectBase.prototype._handleOptionClick = function(event) {
       var value;
-      if ($(event.target).is('li')) {
-        event.preventDefault();
-        value = $(event.target).attr('data-cllctr-value');
-        if (this._trigger('select', event, value)) return this._setValue(value);
-      }
+      event.preventDefault();
+      value = $(event.target).attr('data-cllctr-value');
+      if (this._trigger('select', event, value)) return this._setValue(value);
     };
 
     FugaSelectBase.prototype._getValue = function() {
@@ -159,14 +161,16 @@
       return this.display_el = null;
     };
 
-    FugaSelectDisplay.prototype._selectedOption = function() {
-      var result, self;
-      self = this;
-      result = {};
-      $.each(this._options(), function(index, option) {
-        if (option.value === self._getValue()) return result = option;
+    FugaSelectDisplay.prototype._optionFromValue = function(value) {
+      var matching_options;
+      matching_options = $.grep(this._options(), function(option) {
+        return option.value === value;
       });
-      return result;
+      return matching_options[0];
+    };
+
+    FugaSelectDisplay.prototype._selectedOption = function() {
+      return this._optionFromValue(this._getValue());
     };
 
     FugaSelectDisplay.prototype._setValue = function(new_value) {
@@ -443,6 +447,7 @@
     }
 
     FugaSelect.prototype._createElements = function() {
+      if (this.options.allow_create) this.options.allow_search = true;
       FugaSelect.__super__._createElements.call(this);
       return $('<a />').attr('href', '#').addClass('cllctr-creator').text('Create new...').insertBefore(this.menu());
     };
@@ -452,16 +457,55 @@
       return FugaSelect.__super__._removeElements.call(this);
     };
 
+    FugaSelect.prototype._setupBindings = function() {
+      FugaSelect.__super__._setupBindings.call(this);
+      if (this.creator()) {
+        return this.creator().bind('click', $.proxy(this._handleCreatorClick, this));
+      }
+    };
+
+    FugaSelect.prototype._removeBindings = function() {
+      if (this.creator()) this.creator().unbind('click');
+      return FugaSelect.__super__._removeBindings.call(this);
+    };
+
     FugaSelect.prototype.creator = function() {
       return this.drawer().find('a.cllctr-creator');
     };
 
-    FugaSelect.prototype._perfectMatchOption = function(value) {
+    FugaSelect.prototype._handleCreatorClick = function(event) {
+      var option;
+      event.preventDefault();
+      option = {
+        value: this._generateNewOptionValue(),
+        label: this.searcher().val(),
+        is_new: true
+      };
+      if (this._trigger('create', event, option)) this.add_option(option);
+      return this.search('');
+    };
+
+    FugaSelect.prototype.add_option = function(option) {
+      this._options().push(this._normalizeOption(option));
+      this.menu().html('');
+      return this._renderMenuContent();
+    };
+
+    FugaSelect.prototype._generateNewOptionValue = function() {
+      var number;
+      number = 1;
+      while (this._optionFromValue('new' + number)) {
+        number += 1;
+      }
+      return 'new' + number;
+    };
+
+    FugaSelect.prototype._perfectMatchOption = function(label) {
       var option, _i, _len, _ref;
       _ref = this._options();
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         option = _ref[_i];
-        if (option.value.toLowerCase() === value.toLowerCase()) return option;
+        if (option.label.toLowerCase() === label.toLowerCase()) return option;
       }
       return null;
     };
@@ -470,6 +514,16 @@
       FugaSelect.__super__.search.call(this, value);
       if (this._perfectMatchOption(value) !== null) {
         return this.container().addClass('cllctr-perfect-match');
+      }
+    };
+
+    FugaSelect.prototype._handleOptionClick = function(event) {
+      var option, value;
+      event.preventDefault();
+      value = $(event.target).attr('data-cllctr-value');
+      option = this._optionFromValue(value);
+      if (option.is_new !== true || this._trigger('new_selected', event, option)) {
+        return FugaSelect.__super__._handleOptionClick.call(this, event);
       }
     };
 

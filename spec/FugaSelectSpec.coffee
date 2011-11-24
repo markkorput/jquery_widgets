@@ -300,14 +300,27 @@ describe "Collector (Creator)", ->
     @widget.collector('search', 'second')
     expect(@widget.collector('container')).toHaveClass('cllctr-perfect-match')
 
-  it "should add a new option when the creator option is clicked", ->
+  it "should add a new option with value 'new1' when the creator option is clicked", ->
     @widget.collector('search', '6th')
     @widget.collector('creator').click()
     expect(@widget.collector('menu').find('li[data-cllctr-value=new1]').text()).toEqual('6th')
 
   it "should trigger a create event", ->
     callback_value = null
-    @widget.bind 'collectorcreate', (event, value) -> callabck_value = value
+    @widget.bind 'collectorcreate', (event, new_option) -> callback_value = new_option
     @after -> @widget.unbind 'collectorcreate'
-    @widget.collector('search', 'Number Six')
-    expect(callback_value).toEqual('Number Six')
+    @widget.collector 'search', 'Number Six'
+    @widget.collector('creator').click()
+    expect(callback_value.value).toEqual 'new1'
+    expect(callback_value.label).toEqual 'Number Six'
+
+  it "should trigger a 'new_selected' event when a newly created option was selected", ->
+    callback_value = null
+    @widget.bind 'collectorcreate', (event, option) -> callback_value = option
+    @after -> @widget.unbind 'collectornew_selected'
+    @widget.collector 'search', 'Add Me!'
+    @widget.collector('creator').click()
+    console.log callback_value
+    expect(callback_value.value).toEqual 'new1'
+    expect(callback_value.label).toEqual 'Add Me!'
+

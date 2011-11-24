@@ -33,11 +33,12 @@ class FugaSelectBase
   _handleChange: (event) -> @_setValue @element.val()
 
   _handleMenuClick: (event) ->
-    if $(event.target).is('li')
-      event.preventDefault()
-      value = $(event.target).attr('data-cllctr-value')
-      if @_trigger 'select', event, value
-        @_setValue value
+    @_handleOptionClick(event) if $(event.target).is('li')
+  
+  _handleOptionClick: (event) ->
+    event.preventDefault()
+    value = $(event.target).attr('data-cllctr-value')
+    @_setValue(value) if @_trigger 'select', event, value
 
   _getValue: ->
     return ''+@_value if @_value
@@ -105,13 +106,11 @@ class FugaSelectDisplay extends FugaSelectBase
     @display().remove() if @display()
     @display_el = null
 
-  _selectedOption: ->
-    self = this
-    result = {}
-    $.each @_options(), (index, option) ->
-      # convert option value attributes to strings
-      result = option if option.value == self._getValue()
-    return result
+  _optionFromValue: (value) ->
+    matching_options = $.grep @_options(), (option) -> option.value == value
+    return matching_options[0]
+
+  _selectedOption: -> @_optionFromValue @_getValue()
 
   _setValue: (new_value) ->
     super(new_value)
@@ -292,7 +291,10 @@ class FugaSelectSearcher extends FugaSelectRemover
 
 
 class FugaSelect extends FugaSelectSearcher
+  # options: $.extend({}, FugaSelectSearher.options, allow_remove: false, remove_text: ""})
+
   _createElements: ->
+    @options.allow_search = true if @options.allow_create
     super()
     $('<a />').attr('href', '#').addClass('cllctr-creator').text('Create new...').insertBefore @menu()
 
@@ -300,17 +302,56 @@ class FugaSelect extends FugaSelectSearcher
     @creator().remove() if @creator()
     super()
 
+  _setupBindings: ->
+    super()
+    @creator().bind 'click', $.proxy @_handleCreatorClick, this if @creator()
+
+  _removeBindings: ->
+    @creator().unbind 'click' if @creator()
+    super()
+
   creator: -> @drawer().find('a.cllctr-creator')
 
-  _perfectMatchOption: (value) ->
+  _handleCreatorClick: (event) ->
+    # creator is a link, but it shouldn't redirect or move to an anchor
+    event.preventDefault()
+    # build new option
+    option = {value: @_generateNewOptionValue(), label: @searcher().val(), is_new: true}
+    # trigger callback and continue with create only if it none of the callbacks cancels the event
+    @add_option option if @_trigger 'create', event, option
+    # reset searcher and reset search results
+    @search('')
+
+  add_option: (option) ->
+    # create option object in memory
+    @_options().push @_normalizeOption(option)
+    # clear the options list menu
+    @menu().html('')
+    # re-render the options list menu's content
+    @_renderMenuContent()
+
+  _generateNewOptionValue: ->
+    number = 1
+    while @_optionFromValue('new'+number)
+      number += 1
+    return 'new'+number
+
+  _perfectMatchOption: (label) ->
     for option in @_options()
-      if option.value.toLowerCase() == value.toLowerCase()
+      if option.label.toLowerCase() == label.toLowerCase()
         return option
     return null
 
   search: (value) ->
     super(value)
     @container().addClass('cllctr-perfect-match') if @_perfectMatchOption(value) != null
+
+  _handleOptionClick: (event) ->
+    event.preventDefault()
+    value = $(event.target).attr('data-cllctr-value')
+    option = @_optionFromValue(value)
+    if option.is_new != true || @_trigger 'new_selected', event, option
+      super(event)
 
 
 

@@ -338,23 +338,39 @@
       this.widget.collector('search', 'second');
       return expect(this.widget.collector('container')).toHaveClass('cllctr-perfect-match');
     });
-    it("should add a new option when the creator option is clicked", function() {
+    it("should add a new option with value 'new1' when the creator option is clicked", function() {
       this.widget.collector('search', '6th');
       this.widget.collector('creator').click();
       return expect(this.widget.collector('menu').find('li[data-cllctr-value=new1]').text()).toEqual('6th');
     });
-    return it("should trigger a create event", function() {
+    it("should trigger a create event", function() {
       var callback_value;
       callback_value = null;
-      this.widget.bind('collectorcreate', function(event, value) {
-        var callabck_value;
-        return callabck_value = value;
+      this.widget.bind('collectorcreate', function(event, new_option) {
+        return callback_value = new_option;
       });
       this.after(function() {
         return this.widget.unbind('collectorcreate');
       });
       this.widget.collector('search', 'Number Six');
-      return expect(callback_value).toEqual('Number Six');
+      this.widget.collector('creator').click();
+      expect(callback_value.value).toEqual('new1');
+      return expect(callback_value.label).toEqual('Number Six');
+    });
+    return it("should trigger a 'new_selected' event when a newly created option was selected", function() {
+      var callback_value;
+      callback_value = null;
+      this.widget.bind('collectorcreate', function(event, option) {
+        return callback_value = option;
+      });
+      this.after(function() {
+        return this.widget.unbind('collectornew_selected');
+      });
+      this.widget.collector('search', 'Add Me!');
+      this.widget.collector('creator').click();
+      console.log(callback_value);
+      expect(callback_value.value).toEqual('new1');
+      return expect(callback_value.label).toEqual('Add Me!');
     });
   });
 
