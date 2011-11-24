@@ -276,6 +276,10 @@ describe "Collector (Searching)", ->
     @widget.collector('search', 'our')
     expect(@widget.collector('menu').find('li:eq(3)').html()).toContain 'f<em>our</em>th'
 
+  it "should search capital insensitive", ->
+    @widget.collector('search', 'FIR')
+    expect(@widget.collector('menu').find('li:first')).not.toHaveClass 'cllctr-filtered'
+
 
 describe "Collector (Creator)", ->
 
@@ -287,7 +291,7 @@ describe "Collector (Creator)", ->
   afterEach -> @widget.collector('destroy'); @widget.remove()
 
   it "should add creator option", ->
-    expect(@widget.collector('creator')).toHaveClass('.cllctr-creator')
+    expect(@widget.collector('creator')).toHaveClass('cllctr-creator')
 
   it "should add the cllctr-perfect-match class to the container when a search value has a perfect match", ->
     @widget.collector('search', 'second')

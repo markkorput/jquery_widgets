@@ -307,9 +307,13 @@
       });
       return expect(widget2.collector('searcher')).not.toExist();
     });
-    return it("should emphasize matched text in option labels", function() {
+    it("should emphasize matched text in option labels", function() {
       this.widget.collector('search', 'our');
       return expect(this.widget.collector('menu').find('li:eq(3)').html()).toContain('f<em>our</em>th');
+    });
+    return it("should search capital insensitive", function() {
+      this.widget.collector('search', 'FIR');
+      return expect(this.widget.collector('menu').find('li:first')).not.toHaveClass('cllctr-filtered');
     });
   });
 
@@ -325,7 +329,7 @@
       return this.widget.remove();
     });
     it("should add creator option", function() {
-      return expect(this.widget.collector('creator')).toHaveClass('.cllctr-creator');
+      return expect(this.widget.collector('creator')).toHaveClass('cllctr-creator');
     });
     it("should add the cllctr-perfect-match class to the container when a search value has a perfect match", function() {
       this.widget.collector('search', 'second');

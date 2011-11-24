@@ -219,7 +219,7 @@ class FugaSelectRemover extends FugaSelectToggler
 
 
 
-class FugaSelect extends FugaSelectRemover
+class FugaSelectSearcher extends FugaSelectRemover
   _createElements: ->
     super()
     # search must be explicitly enabled
@@ -283,11 +283,26 @@ class FugaSelect extends FugaSelectRemover
         li.removeClass('cllctr-filtered')
 
 
-  _matchOption: (option, value) -> option.label.indexOf(''+value) != -1
+  _matchOption: (option, value) -> option.label.toLowerCase().indexOf(''+value.toLowerCase()) != -1
 
   unfilter: ->
     # TODO; remove filter classes form the individual items?
     @container().removeClass 'cllctr-filtered'
+
+
+
+class FugaSelect extends FugaSelectSearcher
+  _createElements: ->
+    super()
+    $('<a />').attr('href', '#').addClass('cllctr-creator').text('Create new...').insertBefore @menu()
+
+  _removeElements: ->
+    @creator().remove() if @creator()
+    super()
+
+  creator: -> @drawer().find('a.cllctr-creator')
+
+
 
 
 # register jquery widget from CautiousWidget class

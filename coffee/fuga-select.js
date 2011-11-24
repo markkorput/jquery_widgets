@@ -1,5 +1,5 @@
 (function() {
-  var $, FugaSelect, FugaSelectBase, FugaSelectDisplay, FugaSelectRemover, FugaSelectToggler, root;
+  var $, FugaSelect, FugaSelectBase, FugaSelectDisplay, FugaSelectRemover, FugaSelectSearcher, FugaSelectToggler, root;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
   root = this;
@@ -329,17 +329,17 @@
 
   })();
 
-  FugaSelect = (function() {
+  FugaSelectSearcher = (function() {
 
-    __extends(FugaSelect, FugaSelectRemover);
+    __extends(FugaSelectSearcher, FugaSelectRemover);
 
-    function FugaSelect() {
-      FugaSelect.__super__.constructor.apply(this, arguments);
+    function FugaSelectSearcher() {
+      FugaSelectSearcher.__super__.constructor.apply(this, arguments);
     }
 
-    FugaSelect.prototype._createElements = function() {
+    FugaSelectSearcher.prototype._createElements = function() {
       var searcher;
-      FugaSelect.__super__._createElements.call(this);
+      FugaSelectSearcher.__super__._createElements.call(this);
       if (this.options.allow_search === true) {
         searcher = $('<div />').addClass('cllctr-search').append($('<input>').attr('type', 'text').addClass('cllctr-searcher'));
         if (this.menu) {
@@ -350,36 +350,36 @@
       }
     };
 
-    FugaSelect.prototype._removeElements = function() {
+    FugaSelectSearcher.prototype._removeElements = function() {
       if (this.searcher()) this.searcher().remove();
-      return FugaSelect.__super__._removeElements.call(this);
+      return FugaSelectSearcher.__super__._removeElements.call(this);
     };
 
-    FugaSelect.prototype._setupBindings = function() {
-      FugaSelect.__super__._setupBindings.call(this);
+    FugaSelectSearcher.prototype._setupBindings = function() {
+      FugaSelectSearcher.__super__._setupBindings.call(this);
       if (this.searcher()) {
         return this.searcher().bind('keyup', $.proxy(this._handleSearcherTyping, this));
       }
     };
 
-    FugaSelect.prototype._removeBindings = function() {
+    FugaSelectSearcher.prototype._removeBindings = function() {
       if (this.searcher()) this.searcher().unbind('keyup');
-      return FugaSelect.__super__._removeBindings.call(this);
+      return FugaSelectSearcher.__super__._removeBindings.call(this);
     };
 
-    FugaSelect.prototype.searcher = function() {
+    FugaSelectSearcher.prototype.searcher = function() {
       if (this.container()) {
         return this.drawer().find('.cllctr-search input.cllctr-searcher');
       }
     };
 
-    FugaSelect.prototype._handleSearcherTyping = function(event) {
+    FugaSelectSearcher.prototype._handleSearcherTyping = function(event) {
       if (this._trigger('search', event, this.searcher().val())) {
         return this.search(this.searcher().val());
       }
     };
 
-    FugaSelect.prototype.search = function(value) {
+    FugaSelectSearcher.prototype.search = function(value) {
       if (this.searcher()) this.searcher().val(value);
       this._determineFilteredStates(value);
       this._applySearch({
@@ -388,7 +388,7 @@
       return this.container().addClass('cllctr-filtered');
     };
 
-    FugaSelect.prototype._determineFilteredStates = function(value) {
+    FugaSelectSearcher.prototype._determineFilteredStates = function(value) {
       var option, _i, _len, _ref, _results;
       _ref = this._options();
       _results = [];
@@ -403,7 +403,7 @@
       return _results;
     };
 
-    FugaSelect.prototype._applySearch = function(params) {
+    FugaSelectSearcher.prototype._applySearch = function(params) {
       var li, option, _i, _len, _ref, _results;
       _ref = this._options();
       _results = [];
@@ -422,12 +422,38 @@
       return _results;
     };
 
-    FugaSelect.prototype._matchOption = function(option, value) {
-      return option.label.indexOf('' + value) !== -1;
+    FugaSelectSearcher.prototype._matchOption = function(option, value) {
+      return option.label.toLowerCase().indexOf('' + value.toLowerCase()) !== -1;
     };
 
-    FugaSelect.prototype.unfilter = function() {
+    FugaSelectSearcher.prototype.unfilter = function() {
       return this.container().removeClass('cllctr-filtered');
+    };
+
+    return FugaSelectSearcher;
+
+  })();
+
+  FugaSelect = (function() {
+
+    __extends(FugaSelect, FugaSelectSearcher);
+
+    function FugaSelect() {
+      FugaSelect.__super__.constructor.apply(this, arguments);
+    }
+
+    FugaSelect.prototype._createElements = function() {
+      FugaSelect.__super__._createElements.call(this);
+      return $('<a />').attr('href', '#').addClass('cllctr-creator').text('Create new...').insertBefore(this.menu());
+    };
+
+    FugaSelect.prototype._removeElements = function() {
+      if (this.creator()) this.creator().remove();
+      return FugaSelect.__super__._removeElements.call(this);
+    };
+
+    FugaSelect.prototype.creator = function() {
+      return this.drawer().find('a.cllctr-creator');
     };
 
     return FugaSelect;
