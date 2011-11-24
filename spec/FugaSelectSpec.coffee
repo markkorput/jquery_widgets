@@ -275,3 +275,34 @@ describe "Collector (Searching)", ->
   it "should emphasize matched text in option labels", ->
     @widget.collector('search', 'our')
     expect(@widget.collector('menu').find('li:eq(3)').html()).toContain 'f<em>our</em>th'
+
+
+describe "Collector (Creator)", ->
+
+  beforeEach ->
+    @widget = $('<div id="dummy">&nbsp;</div>').appendTo($('body')).collector
+      options: ['first', 'second', 'third', 'fourth', 'fifth']
+      allow_create: true
+
+  afterEach -> @widget.collector('destroy'); @widget.remove()
+
+  it "should add creator option", ->
+    expect(@widget.collector('creator')).toHaveClass('.cllctr-creator')
+
+  it "should add the cllctr-perfect-match class to the container when a search value has a perfect match", ->
+    @widget.collector('search', 'second')
+    expect(@widget.collector('container')).toHaveClasse('cllctr-perfect-match')
+
+  it "should add a new option when the creator option is clicked", ->
+    @widget.collector('search', '6th')
+    @widget.collector('creator').click()
+    expect(@widget.collector('menu').find('li[data-cllctr-value=new1]').text()).toEqual('6th')
+
+  it "should trigger a create event", ->
+    callback_value = null
+    @widget.bind 'collectorcreate', (event, value) -> callabck_value = value
+    @after -> @widget.unbind 'collectorcreate'
+    @widget.collector('search', 'Number Six')
+    expect(callback_value).toEqual('Number Six')
+    
+  
