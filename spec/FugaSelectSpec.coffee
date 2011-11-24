@@ -304,5 +304,3 @@ describe "Collector (Creator)", ->
     @after -> @widget.unbind 'collectorcreate'
     @widget.collector('search', 'Number Six')
     expect(callback_value).toEqual('Number Six')
-    
-  

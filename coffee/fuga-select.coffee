@@ -140,13 +140,13 @@ class FugaSelectToggler extends FugaSelectDisplay
     # remove any existing container
     @_removeContainer()
     # create the container element and insert it after the original element
-    @container_el = $('<div />').addClass('cllctr-container').addClass('cllctr-collapsed').insertAfter(@element)
+    container = $('<div />').addClass('cllctr-container').addClass('cllctr-collapsed').insertAfter(@element)
     # append the original control inside the container
-    @element.appendTo @container()
+    @element.appendTo container
     # append the display in the container
-    @container().append @display() if @display()
+    container.append @display() if @display()
     # add the drawer
-    @container().append $('<div />').addClass('cllctr-drawer')
+    container.append $('<div />').addClass('cllctr-drawer')
     # add the options menu to the drawer
     @drawer().append @menu() if @menu()
 
@@ -157,10 +157,8 @@ class FugaSelectToggler extends FugaSelectDisplay
       @display().insertBefore(@container()) if @display()
       @menu().insertBefore(@container()) if @menu()
       @drawer().remove() if @drawer()
-
       # now remove container
       @container().remove()
-    @container_el = null
 
   _setupBindings: ->
     super()
@@ -178,7 +176,7 @@ class FugaSelectToggler extends FugaSelectDisplay
     super(event)
     @close()
 
-  container: -> @container_el
+  container: -> @element.parent('.cllctr-container')
 
   drawer: -> @container().find('.cllctr-drawer') if @container()
 

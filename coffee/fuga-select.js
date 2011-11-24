@@ -208,11 +208,12 @@
     };
 
     FugaSelectToggler.prototype._createContainer = function() {
+      var container;
       this._removeContainer();
-      this.container_el = $('<div />').addClass('cllctr-container').addClass('cllctr-collapsed').insertAfter(this.element);
-      this.element.appendTo(this.container());
-      if (this.display()) this.container().append(this.display());
-      this.container().append($('<div />').addClass('cllctr-drawer'));
+      container = $('<div />').addClass('cllctr-container').addClass('cllctr-collapsed').insertAfter(this.element);
+      this.element.appendTo(container);
+      if (this.display()) container.append(this.display());
+      container.append($('<div />').addClass('cllctr-drawer'));
       if (this.menu()) return this.drawer().append(this.menu());
     };
 
@@ -222,9 +223,8 @@
         if (this.display()) this.display().insertBefore(this.container());
         if (this.menu()) this.menu().insertBefore(this.container());
         if (this.drawer()) this.drawer().remove();
-        this.container().remove();
+        return this.container().remove();
       }
-      return this.container_el = null;
     };
 
     FugaSelectToggler.prototype._setupBindings = function() {
@@ -249,7 +249,7 @@
     };
 
     FugaSelectToggler.prototype.container = function() {
-      return this.container_el;
+      return this.element.parent('.cllctr-container');
     };
 
     FugaSelectToggler.prototype.drawer = function() {
